@@ -10,6 +10,7 @@ interface DataContextType {
   getApplicationsForStudent: (studentId: number) => (Application & { internship: Internship | undefined })[];
   applyForInternship: (studentId: number, internshipId: number) => boolean;
   addInternship: (internship: Omit<Internship, 'id' | 'companyName'>, companyId: number) => void;
+  deleteInternship: (internshipId: number) => void;
   updateApplicationStatus: (applicationId: number, status: ApplicationStatus) => void;
 }
 
@@ -24,20 +25,26 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (!company) return;
 
     const newInternship: Internship = {
-      id: internships.length + 1,
+      id: internships.length > 0 ? Math.max(...internships.map(i => i.id)) + 1 : 1,
       ...internshipData,
       companyId,
       companyName: company.name
     };
     setInternships(prev => [...prev, newInternship]);
-  }, [internships.length]);
+  }, [internships]);
+
+  const deleteInternship = useCallback((internshipId: number) => {
+    setInternships(prev => prev.filter(i => i.id !== internshipId));
+    // Also remove related applications for data consistency
+    setApplications(prev => prev.filter(a => a.internshipId !== internshipId));
+  }, []);
 
   const applyForInternship = useCallback((studentId: number, internshipId: number) => {
     const alreadyApplied = applications.some(app => app.studentId === studentId && app.internshipId === internshipId);
     if (alreadyApplied) return false;
 
     const newApplication: Application = {
-      id: applications.length + 1,
+      id: applications.length > 0 ? Math.max(...applications.map(a => a.id)) + 1 : 1,
       studentId,
       internshipId,
       status: ApplicationStatus.APPLIED
@@ -71,7 +78,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [applications, internships]);
 
   return (
-    <DataContext.Provider value={{ internships, applications, getApplicationsForCompany, getApplicationsForStudent, applyForInternship, addInternship, updateApplicationStatus }}>
+    <DataContext.Provider value={{ internships, applications, getApplicationsForCompany, getApplicationsForStudent, applyForInternship, addInternship, deleteInternship, updateApplicationStatus }}>
       {children}
     </DataContext.Provider>
   );

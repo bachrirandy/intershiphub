@@ -1,5 +1,4 @@
-
-import { User, Role, Internship, Application, ApplicationStatus } from '../types';
+import { User, Role, Internship, Application, ApplicationStatus, JobType } from '../types';
 
 export let users: User[] = [
     {
@@ -19,7 +18,8 @@ export let users: User[] = [
         role: Role.COMPANY,
         name: 'TechCorp',
         field: 'Technology',
-        description: 'A leading technology company innovating for the future.'
+        description: 'A leading technology company innovating for the future.',
+        logoUrl: 'https://placehold.co/100x100/0074E4/FFFFFF/png?text=TC'
     },
     {
         id: 3,
@@ -45,9 +45,25 @@ export let users: User[] = [
         role: Role.COMPANY,
         name: 'Innovate Inc.',
         field: 'Software Development',
-        description: 'Building innovative software solutions for businesses.'
+        description: 'Building innovative software solutions for businesses.',
+        logoUrl: 'https://placehold.co/100x100/264E86/FFFFFF/png?text=II'
     }
 ];
+
+// Helper to get a date in YYYY-MM-DD format
+const getDateString = (month: number, day: number) => {
+    const date = new Date();
+    date.setMonth(month - 1, day);
+    // Handle year wrapping for previous/next year months
+    if (month < 1) {
+        date.setFullYear(date.getFullYear() - 1);
+    } else if (month > 12) {
+        date.setFullYear(date.getFullYear() + 1);
+    }
+    return date.toISOString().split('T')[0];
+}
+
+const currentMonth = new Date().getMonth() + 1;
 
 export let internships: Internship[] = [
     {
@@ -58,6 +74,9 @@ export let internships: Internship[] = [
         description: 'Work with our frontend team to build amazing user experiences.',
         location: 'Jakarta',
         duration: '3 Months',
+        jobType: JobType.HYBRID,
+        postedDate: getDateString(currentMonth, 5), // 5th of current month
+        closingDate: getDateString(currentMonth + 1, 5), // 5th of next month
         requirements: ['HTML', 'CSS', 'JavaScript', 'React'],
         field: 'Software Engineering'
     },
@@ -69,6 +88,9 @@ export let internships: Internship[] = [
         description: 'Join our backend team to work on scalable server-side applications.',
         location: 'Bandung',
         duration: '6 Months',
+        jobType: JobType.ONSITE,
+        postedDate: getDateString(currentMonth, 15), // 15th of current month
+        closingDate: getDateString(currentMonth + 1, 15), // 15th of next month
         requirements: ['Node.js', 'Express', 'SQL', 'REST APIs'],
         field: 'Software Engineering'
     },
@@ -80,6 +102,9 @@ export let internships: Internship[] = [
         description: 'Assist our marketing team with social media campaigns and SEO.',
         location: 'Surabaya',
         duration: '3 Months',
+        jobType: JobType.REMOTE,
+        postedDate: getDateString(currentMonth, 22), // 22nd of current month
+        closingDate: getDateString(currentMonth + 1, 22), // 22nd of next month
         requirements: ['Marketing knowledge', 'Good communication skills'],
         field: 'Marketing'
     }

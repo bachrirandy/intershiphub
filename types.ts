@@ -1,4 +1,4 @@
-
+// FIX: Removed self-import of 'Role' which caused a declaration conflict.
 export enum Role {
     STUDENT = 'STUDENT',
     COMPANY = 'COMPANY',
@@ -9,6 +9,12 @@ export enum ApplicationStatus {
     APPLIED = 'Applied',
     ACCEPTED = 'Accepted',
     REJECTED = 'Rejected'
+}
+
+export enum JobType {
+    ONSITE = 'On-site',
+    REMOTE = 'Remote',
+    HYBRID = 'Hybrid'
 }
 
 export interface User {
@@ -24,6 +30,7 @@ export interface User {
     // Company specific
     field?: string;
     description?: string;
+    logoUrl?: string; // Added for company logo
 }
 
 export interface Internship {
@@ -34,6 +41,9 @@ export interface Internship {
     description: string;
     location: string;
     duration: string; // e.g., "3 Months", "6 Months"
+    jobType: JobType;
+    postedDate: string; // YYYY-MM-DD format
+    closingDate: string; // YYYY-MM-DD format
     requirements: string[];
     field: string; // e.g., "Software Engineering", "Marketing"
 }

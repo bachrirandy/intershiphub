@@ -1,6 +1,5 @@
-
-import React, { useEffect, useRef } from 'react';
-import { HashRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { DataProvider } from './contexts/DataContext';
 import { ToastProvider } from './contexts/ToastContext';
@@ -22,42 +21,11 @@ const PrivateRoute: React.FC<{ children: React.ReactNode; roles: Role[] }> = ({ 
   return <>{children}</>;
 };
 
-const usePrevious = <T,>(value: T) => {
-    // FIX: Provide an explicit initial value to useRef to address "Expected 1 arguments, but got 0" error.
-    const ref = useRef<T | undefined>(undefined);
-    useEffect(() => {
-        ref.current = value;
-    });
-    return ref.current;
-}
-
 const AppContent: React.FC = () => {
     const { isAuthModalOpen, authModalConfig } = useModal();
-    const { user } = useAuth();
-    const prevUser = usePrevious(user);
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        // Only redirect if we transition from logged-out to logged-in state
-        if (!prevUser && user) {
-            switch (user.role) {
-                case Role.STUDENT:
-                    navigate('/student');
-                    break;
-                case Role.COMPANY:
-                    navigate('/company');
-                    break;
-                case Role.ADMIN:
-                    navigate('/admin');
-                    break;
-                default:
-                    navigate('/');
-            }
-        }
-    }, [user, prevUser, navigate]);
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans">
+        <div className="min-h-screen bg-[#EFF0F4] font-sans">
             <Navbar />
             <main>
                 <Routes>

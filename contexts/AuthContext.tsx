@@ -1,16 +1,16 @@
-import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
+import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { User, Role } from '../types';
 import { users as dummyUsers } from '../data/dummyData';
 import { useToast } from './ToastContext';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string, role: Role) => void;
-  register: (name: string, email: string, password: string, role: Role) => void;
+  login: (email: string, password: string, role: Role) => Promise<User | null>;
+  register: (name: string, email: string, password: string, role: Role) => Promise<User | null>;
   logout: () => void;
   updateStudentProfile: (profile: Partial<User>) => void;
   updateCompanyProfile: (profile: Partial<User>) => void;
-  loginWithGoogle: (role: Role) => void;
+  loginWithGoogle: (role: Role) => Promise<User | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,21 +19,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<User | null>(null);
   const { addToast } = useToast();
 
-  const login = useCallback((email: string, password: string, role: Role) => {
+  const login = async (email: string, password: string, role: Role): Promise<User | null> => {
     const foundUser = dummyUsers.find(u => u.email === email && u.role === role && u.password === password);
     if (foundUser) {
       setUser(foundUser);
       addToast('Login berhasil!', 'success');
+      return foundUser;
     } else {
       addToast('Email atau password salah.', 'error');
+      return null;
     }
-  }, [addToast]);
+  };
 
-  const register = useCallback((name: string, email: string, password: string, role: Role) => {
+  const register = async (name: string, email: string, password: string, role: Role): Promise<User | null> => {
       const existingUser = dummyUsers.find(u => u.email === email);
       if (existingUser) {
           addToast('Email sudah terdaftar.', 'error');
-          return;
+          return null;
       }
       
       const newUser: User = {
@@ -48,29 +50,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       dummyUsers.push(newUser);
       setUser(newUser);
       addToast('Registrasi berhasil!', 'success');
-  }, [addToast]);
+      return newUser;
+  };
   
-  const loginWithGoogle = useCallback((role: Role) => {
-    // This is a simulation. In a real app, this would involve a popup,
-    // a redirect to Google, and handling the callback.
-    // Here, we'll just log in a predefined user based on the role.
+  const loginWithGoogle = async (role: Role): Promise<User | null> => {
     let foundUser: User | undefined;
     if (role === Role.STUDENT) {
-        // Log in a default student user for the demo
         foundUser = dummyUsers.find(u => u.email === 'johndoe@email.com');
     } else if (role === Role.COMPANY) {
-        // Log in a default company user for the demo
         foundUser = dummyUsers.find(u => u.email === 'techcorp@email.com');
     }
 
     if (foundUser) {
         setUser(foundUser);
         addToast('Login dengan Google berhasil!', 'success');
+        return foundUser;
     } else {
-        // This case shouldn't happen with dummy data, but it's good practice.
         addToast('Gagal login dengan Google. Pengguna demo tidak ditemukan.', 'error');
+        return null;
     }
-  }, [addToast]);
+  };
 
   const logout = () => {
     setUser(null);

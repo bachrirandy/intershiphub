@@ -9,6 +9,7 @@ const BriefcaseIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h
 const PlusCircleIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
 const BuildingOfficeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5h4v5h-4z" /></svg>;
 const ChartBarIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>;
+const CalendarIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>;
 
 
 interface SidebarProps {
@@ -21,12 +22,14 @@ const Sidebar: React.FC<SidebarProps> = ({ role, activeTab, setActiveTab }) => {
     const studentTabs = [
         { id: 'search', label: 'Cari Internship', icon: <SearchIcon /> },
         { id: 'applications', label: 'Lamaran Saya', icon: <DocumentTextIcon /> },
+        { id: 'calendar', label: 'Kalender', icon: <CalendarIcon /> },
         { id: 'profile', label: 'Profil Saya', icon: <UserCircleIcon /> }
     ];
 
     const companyTabs = [
         { id: 'listings', label: 'Lowongan Saya', icon: <BriefcaseIcon /> },
         { id: 'post', label: 'Buat Lowongan', icon: <PlusCircleIcon /> },
+        { id: 'calendar', label: 'Kalender', icon: <CalendarIcon /> },
         { id: 'profile', label: 'Profil Perusahaan', icon: <BuildingOfficeIcon /> }
     ];
 
@@ -52,10 +55,10 @@ const Sidebar: React.FC<SidebarProps> = ({ role, activeTab, setActiveTab }) => {
                     <button 
                         key={tab.id} 
                         onClick={() => setActiveTab(tab.id)}
-                        className={`w-full flex items-center px-4 py-2 text-left text-sm font-medium rounded-md transition-colors ${activeTab === tab.id ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'}`}
+                        className={`w-full flex items-center px-4 py-2 text-left text-sm font-medium rounded-md transition-colors ${activeTab === tab.id ? 'bg-[#74DBEF]/50 text-[#0074E4]' : 'text-[#264E86]/80 hover:bg-[#EFF0F4] hover:text-[#264E86]'}`}
                         aria-current={activeTab === tab.id ? 'page' : undefined}
                     >
-                        <span className="mr-3 h-5 w-5 text-gray-500">{tab.icon}</span>
+                        <span className={`mr-3 h-5 w-5 ${activeTab === tab.id ? 'text-[#0074E4]' : 'text-[#264E86]/60'}`}>{tab.icon}</span>
                         <span>{tab.label}</span>
                     </button>
                 ))}
