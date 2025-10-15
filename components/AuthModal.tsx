@@ -23,6 +23,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', initialRol
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   const { login, register, loginWithGoogle } = useAuth();
   const { closeAuthModal } = useModal();
   const { addToast } = useToast();
@@ -31,28 +33,46 @@ const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', initialRol
   useEffect(() => {
     setMode(initialMode);
     setRole(initialRole);
+    setErrors({}); // Reset errors on mode/role change
   }, [initialMode, initialRole]);
+  
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    if (mode === 'register') {
+      if (!name) newErrors.name = 'Nama tidak boleh kosong.';
+      else if (name.length < 2) newErrors.name = 'Nama minimal 2 karakter.';
+
+      if (!email) newErrors.email = 'Email tidak boleh kosong.';
+      else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = 'Format email tidak valid.';
+
+      if (!password) newErrors.password = 'Password tidak boleh kosong.';
+      else {
+          if (password.length < 8) newErrors.password = 'Password minimal 8 karakter.';
+          if (!/[A-Z]/.test(password)) newErrors.password = 'Harus ada min. 1 huruf besar.';
+          if (!/[a-z]/.test(password)) newErrors.password = 'Harus ada min. 1 huruf kecil.';
+          if (!/\d/.test(password)) newErrors.password = 'Harus ada min. 1 angka.';
+          if (!/[^A-Za-z0-9]/.test(password)) newErrors.password = 'Harus ada min. 1 simbol.';
+      }
+
+      if (password !== confirmPassword) newErrors.confirmPassword = 'Password tidak cocok.';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
 
   const handleNavigation = (userRole: Role) => {
     switch (userRole) {
-        case Role.STUDENT:
-            navigate('/student');
-            break;
-        case Role.COMPANY:
-            navigate('/company');
-            break;
-        case Role.ADMIN:
-            navigate('/admin');
-            break;
-        default:
-            navigate('/');
+        case Role.STUDENT: navigate('/student'); break;
+        case Role.COMPANY: navigate('/company'); break;
+        case Role.ADMIN: navigate('/admin'); break;
+        default: navigate('/');
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (mode === 'register' && password !== confirmPassword) {
-      addToast('Password tidak cocok.', 'error');
+    if (mode === 'register' && !validate()) {
+      addToast('Harap perbaiki error pada form.', 'error');
       return;
     }
 
@@ -76,10 +96,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', initialRol
         closeAuthModal();
     }
   };
+  
+  const getInputStyle = (field: string) => `shadow appearance-none border rounded w-full py-2 px-3 text-[#264E86] bg-white leading-tight focus:outline-none focus:ring-2 focus:ring-[#0074E4] ${errors[field] ? 'border-red-500' : 'border-gray-300'}`;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md relative">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in" role="dialog" aria-modal="true">
+      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md relative animate-scale-in">
         <button onClick={closeAuthModal} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -124,61 +146,37 @@ const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', initialRol
         </div>
 
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           {mode === 'register' && (
             <div className="mb-4">
               <label className="block text-[#264E86] text-sm font-bold mb-2" htmlFor="name">
                 Nama {role === Role.STUDENT ? 'Lengkap' : 'Perusahaan'}
               </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-[#264E86] bg-white leading-tight focus:outline-none focus:ring-2 focus:ring-[#0074E4]"
-                required
-              />
+              <input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} className={getInputStyle('name')} required />
+              {errors.name && <p className="text-red-500 text-xs italic mt-1">{errors.name}</p>}
             </div>
           )}
           <div className="mb-4">
             <label className="block text-[#264E86] text-sm font-bold mb-2" htmlFor="email">
               Email
             </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-[#264E86] bg-white leading-tight focus:outline-none focus:ring-2 focus:ring-[#0074E4]"
-              required
-            />
+            <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={getInputStyle('email')} required />
+            {errors.email && <p className="text-red-500 text-xs italic mt-1">{errors.email}</p>}
           </div>
           <div className="mb-4">
             <label className="block text-[#264E86] text-sm font-bold mb-2" htmlFor="password">
                 Password
             </label>
-            <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-[#264E86] bg-white leading-tight focus:outline-none focus:ring-2 focus:ring-[#0074E4]"
-                required
-            />
+            <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={getInputStyle('password')} required />
+            {errors.password && <p className="text-red-500 text-xs italic mt-1">{errors.password}</p>}
           </div>
           {mode === 'register' && (
             <div className="mb-6">
               <label className="block text-[#264E86] text-sm font-bold mb-2" htmlFor="confirm-password">
                   Konfirmasi Password
               </label>
-              <input
-                  id="confirm-password"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-[#264E86] bg-white leading-tight focus:outline-none focus:ring-2 focus:ring-[#0074E4]"
-                  required
-              />
+              <input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={getInputStyle('confirmPassword')} required />
+              {errors.confirmPassword && <p className="text-red-500 text-xs italic mt-1">{errors.confirmPassword}</p>}
             </div>
           )}
           <button

@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import { Role } from '../types';
 
 // Icons
@@ -14,27 +15,23 @@ const CalendarIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-
 
 interface SidebarProps {
     role: Role;
-    activeTab: string;
-    setActiveTab: (tab: string) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ role, activeTab, setActiveTab }) => {
+const Sidebar: React.FC<SidebarProps> = ({ role }) => {
     const studentTabs = [
-        { id: 'search', label: 'Cari Internship', icon: <SearchIcon /> },
-        { id: 'applications', label: 'Lamaran Saya', icon: <DocumentTextIcon /> },
-        { id: 'calendar', label: 'Kalender', icon: <CalendarIcon /> },
-        { id: 'profile', label: 'Profil Saya', icon: <UserCircleIcon /> }
+        { id: 'search', label: 'Cari Internship', icon: <SearchIcon />, path: '/student' },
+        { id: 'applications', label: 'Lamaran Saya', icon: <DocumentTextIcon />, path: '/student/applications' },
+        { id: 'calendar', label: 'Kalender', icon: <CalendarIcon />, path: '/student/calendar' },
     ];
 
     const companyTabs = [
-        { id: 'listings', label: 'Lowongan Saya', icon: <BriefcaseIcon /> },
-        { id: 'post', label: 'Buat Lowongan', icon: <PlusCircleIcon /> },
-        { id: 'calendar', label: 'Kalender', icon: <CalendarIcon /> },
-        { id: 'profile', label: 'Profil Perusahaan', icon: <BuildingOfficeIcon /> }
+        { id: 'listings', label: 'Lowongan Saya', icon: <BriefcaseIcon />, path: '/company' },
+        { id: 'post', label: 'Buat Lowongan', icon: <PlusCircleIcon />, path: '/company/post' },
+        { id: 'calendar', label: 'Kalender', icon: <CalendarIcon />, path: '/company/calendar' },
     ];
 
     const adminTabs = [
-        { id: 'stats', label: 'Statistics', icon: <ChartBarIcon /> }
+        { id: 'stats', label: 'Statistics', icon: <ChartBarIcon />, path: '/admin' }
     ];
 
     const getTabs = () => {
@@ -52,15 +49,17 @@ const Sidebar: React.FC<SidebarProps> = ({ role, activeTab, setActiveTab }) => {
         <aside className="w-full md:w-64 bg-white shadow-md rounded-lg p-4 flex-shrink-0" aria-label="Sidebar">
             <nav className="space-y-2">
                 {tabs.map(tab => (
-                    <button 
-                        key={tab.id} 
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`w-full flex items-center px-4 py-2 text-left text-sm font-medium rounded-md transition-colors ${activeTab === tab.id ? 'bg-[#74DBEF]/50 text-[#0074E4]' : 'text-[#264E86]/80 hover:bg-[#EFF0F4] hover:text-[#264E86]'}`}
-                        aria-current={activeTab === tab.id ? 'page' : undefined}
+                    <NavLink
+                        key={tab.id}
+                        to={tab.path}
+                        end={tab.path === '/student' || tab.path === '/company' || tab.path === '/admin'}
+                        className={({ isActive }) => 
+                            `w-full flex items-center px-4 py-2 text-left text-sm font-medium rounded-md transition-colors text-[#264E86]/80 hover:bg-[#EFF0F4] hover:text-[#264E86] ${isActive ? "bg-[#74DBEF]/50 text-[#0074E4]" : ""}`
+                        }
                     >
-                        <span className={`mr-3 h-5 w-5 ${activeTab === tab.id ? 'text-[#0074E4]' : 'text-[#264E86]/60'}`}>{tab.icon}</span>
+                         <span className="mr-3 h-5 w-5">{tab.icon}</span>
                         <span>{tab.label}</span>
-                    </button>
+                    </NavLink>
                 ))}
             </nav>
         </aside>

@@ -1,139 +1,132 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useModal } from '../contexts/ModalContext';
-import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
-import { useToast } from '../contexts/ToastContext';
+import { useData } from '../contexts/DataContext';
 import { Role, Internship } from '../types';
 import InternshipCard from '../components/InternshipCard';
 import InternshipDetailModal from '../components/InternshipDetailModal';
-
+import ApplicationFormModal from '../components/ApplicationFormModal';
 
 const LandingPage: React.FC = () => {
     const { openAuthModal } = useModal();
-    const { internships, applyForInternship } = useData();
     const { user } = useAuth();
-    const { addToast } = useToast();
+    const { internships } = useData();
+    const navigate = useNavigate();
+
     const [selectedInternship, setSelectedInternship] = useState<Internship | null>(null);
+    const [applyingTo, setApplyingTo] = useState<Internship | null>(null);
 
-    const handleStudentRegister = () => {
-        openAuthModal({ mode: 'register', role: Role.STUDENT });
-    };
+    const latestInternships = useMemo(() => {
+        return internships.slice(0, 6);
+    }, [internships]);
 
-    const handleCompanyRegister = () => {
-        openAuthModal({ mode: 'register', role: Role.COMPANY });
-    };
-
-    const handleApply = (internshipId: number) => {
+    const handleApply = (internship: Internship) => {
         if (!user) {
             openAuthModal({ mode: 'login', role: Role.STUDENT });
-            return;
-        }
-        if (user.role === Role.STUDENT) {
-            const success = applyForInternship(user.id, internshipId);
-            if (success) {
-                addToast('Lamaran berhasil dikirim!', 'success');
-            } else {
-                addToast('Anda sudah pernah melamar di posisi ini.', 'error');
-            }
         } else {
-            addToast('Hanya mahasiswa yang dapat melamar.', 'error');
+            setApplyingTo(internship);
+        }
+    };
+    
+    const handleViewAllClick = () => {
+        if (user && user.role === Role.STUDENT) {
+            navigate('/student');
+        } else {
+            openAuthModal({ mode: 'login', role: Role.STUDENT });
         }
     };
 
     return (
-        <div className="animate-fade-in-slide-up">
+        <div className="animate-fade-in">
             {/* Hero Section */}
             <section className="bg-white py-20">
                 <div className="container mx-auto px-6 text-center">
-                    <h1 className="text-5xl font-bold text-[#0074E4] mb-4">
-                        Temukan Internship Impianmu
+                    <h1 className="text-5xl font-bold text-[#264E86] mb-4">
+                        Temukan Peluang Magang Impianmu
                     </h1>
-                    <p className="text-lg text-[#264E86]/80 mb-8 max-w-3xl mx-auto">
-                        InternshipHub adalah jembatan antara mahasiswa berbakat dengan perusahaan terkemuka. Mulai karirmu dari sini.
+                    <p className="text-xl text-[#264E86]/80 mb-8 max-w-3xl mx-auto">
+                        InternshipHub menghubungkan mahasiswa berbakat dengan perusahaan inovatif untuk pengalaman magang yang tak ternilai.
                     </p>
-                    <div className="flex justify-center space-x-4">
+                    <div className="space-x-4">
                         <button 
-                            onClick={handleStudentRegister} 
-                            className="px-8 py-3 bg-[#0074E4] text-white font-bold rounded-lg hover:bg-[#264E86] transition-colors"
+                            onClick={() => openAuthModal({ mode: 'register', role: Role.STUDENT })}
+                            className="bg-[#0074E4] text-white font-bold py-3 px-8 rounded-lg hover:bg-[#264E86] transition-transform transform hover:scale-105"
                         >
-                            Cari Internship
+                            Cari Magang
                         </button>
                         <button 
-                            onClick={handleCompanyRegister} 
-                            className="px-8 py-3 bg-transparent border-2 border-[#0074E4] text-[#0074E4] font-bold rounded-lg hover:bg-[#0074E4]/10 transition-colors"
+                            onClick={() => openAuthModal({ mode: 'register', role: Role.COMPANY })}
+                            className="bg-transparent text-[#0074E4] font-bold py-3 px-8 rounded-lg border-2 border-[#0074E4] hover:bg-[#0074E4]/10 transition-transform transform hover:scale-105"
                         >
-                            Posting Lowongan
+                            Rekrut Talenta
                         </button>
                     </div>
                 </div>
             </section>
 
-            {/* Featured Internships */}
+            {/* Latest Internships Section */}
             <section className="py-16 bg-[#EFF0F4]">
                 <div className="container mx-auto px-6">
-                    <h2 className="text-3xl font-bold text-center text-[#264E86] mb-10">
-                        Lowongan Terbaru
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {internships.slice(0, 6).map(internship => (
-                            <InternshipCard 
-                                key={internship.id} 
+                    <h2 className="text-3xl font-bold text-center text-[#264E86] mb-12">Lowongan Terbaru</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {latestInternships.map(internship => (
+                            <InternshipCard
+                                key={internship.id}
                                 internship={internship}
-                                onViewDetail={setSelectedInternship}
+                                onViewDetails={setSelectedInternship}
                                 onApply={handleApply}
-                                userRole={user?.role || null}
                             />
                         ))}
                     </div>
-                    {internships.length === 0 && (
-                        <p className="text-center text-[#264E86]/75">Saat ini belum ada lowongan tersedia.</p>
-                    )}
+                    <div className="text-center mt-12">
+                        <button
+                            onClick={handleViewAllClick}
+                            className="bg-white text-[#264E86] font-bold py-3 px-8 rounded-lg border border-[#264E86]/20 hover:bg-[#74DBEF]/50 transition-colors shadow-sm"
+                        >
+                            Lihat Semua Lowongan
+                        </button>
+                    </div>
                 </div>
             </section>
-            
-            {/* How it works */}
-            <section className="py-20 bg-white">
+
+            {/* Features Section */}
+            <section className="py-16 bg-white">
                 <div className="container mx-auto px-6">
-                    <h2 className="text-3xl font-bold text-center text-[#264E86] mb-12">
-                        Bagaimana Cara Kerjanya?
-                    </h2>
-                    <div className="flex flex-col md:flex-row justify-center items-center gap-12">
-                        {/* For Students */}
-                        <div className="text-center max-w-sm">
-                            <div className="bg-[#74DBEF]/30 rounded-full h-24 w-24 flex items-center justify-center mx-auto mb-4">
-                               <p className="text-4xl">👨‍🎓</p>
-                            </div>
-                            <h3 className="text-2xl font-bold text-[#0074E4] mb-2">Untuk Mahasiswa</h3>
+                    <h2 className="text-3xl font-bold text-center text-[#264E86] mb-12">Mengapa Memilih InternshipHub?</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                        <div className="bg-[#EFF0F4] p-8 rounded-lg">
+                            <h3 className="text-xl font-bold text-[#0074E4] mb-2">Untuk Mahasiswa</h3>
                             <p className="text-[#264E86]/80">
-                                Buat profil, unggah CV, dan jelajahi ratusan lowongan magang. Lamar dengan sekali klik dan pantau status lamaranmu.
+                                Temukan ribuan lowongan magang yang sesuai dengan jurusan dan minatmu. Bangun profil profesional dan lamar dengan mudah.
                             </p>
                         </div>
-
-                        {/* For Companies */}
-                        <div className="text-center max-w-sm">
-                             <div className="bg-[#74DBEF]/30 rounded-full h-24 w-24 flex items-center justify-center mx-auto mb-4">
-                                <p className="text-4xl">🏢</p>
-                            </div>
-                            <h3 className="text-2xl font-bold text-[#0074E4] mb-2">Untuk Perusahaan</h3>
+                        <div className="bg-[#EFF0F4] p-8 rounded-lg">
+                            <h3 className="text-xl font-bold text-[#0074E4] mb-2">Untuk Perusahaan</h3>
                             <p className="text-[#264E86]/80">
-                                Posting lowongan magang dengan mudah, kelola kandidat yang masuk, dan temukan talenta terbaik untuk tim Anda.
+                                Dapatkan akses ke talenta-talenta muda terbaik dari berbagai universitas. Kelola proses rekrutmen dengan efisien.
+                            </p>
+                        </div>
+                        <div className="bg-[#EFF0F4] p-8 rounded-lg">
+                            <h3 className="text-xl font-bold text-[#0074E4] mb-2">Terpercaya & Aman</h3>
+                            <p className="text-[#264E86]/80">
+                                Semua perusahaan dan lowongan telah kami verifikasi untuk memastikan pengalaman yang aman dan berkualitas.
                             </p>
                         </div>
                     </div>
                 </div>
             </section>
-
-            {/* Footer */}
-            <footer className="bg-[#264E86] text-white py-8">
-                <div className="container mx-auto px-6 text-center">
-                    <p>&copy; {new Date().getFullYear()} InternshipHub. All rights reserved.</p>
-                </div>
-            </footer>
-
+            
             {selectedInternship && (
                 <InternshipDetailModal 
                     internship={selectedInternship} 
                     onClose={() => setSelectedInternship(null)} 
+                />
+            )}
+            {applyingTo && (
+                <ApplicationFormModal 
+                    internship={applyingTo}
+                    onClose={() => setApplyingTo(null)}
                 />
             )}
         </div>
