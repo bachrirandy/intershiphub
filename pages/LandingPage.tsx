@@ -6,7 +6,6 @@ import { useData } from '../contexts/DataContext';
 import { Role, Internship } from '../types';
 import InternshipCard from '../components/InternshipCard';
 import InternshipDetailModal from '../components/InternshipDetailModal';
-import ApplicationFormModal from '../components/ApplicationFormModal';
 
 const LandingPage: React.FC = () => {
     const { openAuthModal } = useModal();
@@ -15,7 +14,6 @@ const LandingPage: React.FC = () => {
     const navigate = useNavigate();
 
     const [selectedInternship, setSelectedInternship] = useState<Internship | null>(null);
-    const [applyingTo, setApplyingTo] = useState<Internship | null>(null);
 
     const latestInternships = useMemo(() => {
         return internships.slice(0, 6);
@@ -25,7 +23,7 @@ const LandingPage: React.FC = () => {
         if (!user) {
             openAuthModal({ mode: 'login', role: Role.STUDENT });
         } else {
-            setApplyingTo(internship);
+            navigate(`/student/apply/${internship.id}`);
         }
     };
     
@@ -121,12 +119,6 @@ const LandingPage: React.FC = () => {
                 <InternshipDetailModal 
                     internship={selectedInternship} 
                     onClose={() => setSelectedInternship(null)} 
-                />
-            )}
-            {applyingTo && (
-                <ApplicationFormModal 
-                    internship={applyingTo}
-                    onClose={() => setApplyingTo(null)}
                 />
             )}
         </div>

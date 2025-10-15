@@ -63,8 +63,49 @@ export interface Application {
     studentId: number;
     status: ApplicationStatus;
     applicationDate: string; // YYYY-MM-DD
-    coverLetter?: string;
-    // Denormalized for easier display
+    
+    // Step 1: Personal Information
+    fullName: string;
+    studentIdNumber: string; // NIM
+    major: string;
+    university: string;
+    currentSemester: number;
+    gender: 'Laki-laki' | 'Perempuan' | 'Lainnya';
+    dateOfBirth: string; // YYYY-MM-DD
+    phoneNumber: string;
+    activeEmail: string;
+    address: string;
+    profilePictureFileName?: string;
+    
+    // Step 2: Supporting Documents
+    cvFileName: string;
+    recommendationLetterFileName?: string;
+    transcriptFileName: string;
+    portfolioFileNameOrLink?: string;
+    certificatesFileName?: string;
+
+    // Step 3: Academic & Skills Information
+    gpa: number;
+    mainSkills: string[];
+    softwareTools: string[];
+    languages: string[];
+    organizationalExperience?: string;
+    previousInternshipExperience?: string;
+
+    // Step 4: Application Details
+    reasonForApplying: string;
+    internshipStartDate: string; // YYYY-MM-DD
+    internshipEndDate: string; // YYYY-MM-DD
+    preferredWorkType: 'WFO' | 'WFH' | 'Hybrid';
+    expectedSalary?: number;
+
+    // Step 5: Confirmation
+    dataAuthenticityConfirmation: boolean;
+    dataProcessingConsent: boolean;
+    eSignature: string; // typed name
+    
+    // Backward compatibility & denormalized data
+    nik?: string; // from old form, can be removed in future
     internship?: Internship;
     student?: User;
 }

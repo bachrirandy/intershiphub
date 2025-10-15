@@ -1,19 +1,22 @@
 import React, { useState, useMemo } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useData } from '../contexts/DataContext';
 import { Internship } from '../types';
 import InternshipCard from '../components/InternshipCard';
-import ApplicationFormModal from '../components/ApplicationFormModal';
 import { StudentDashboardContextType } from './StudentDashboard';
 
 const StudentSearchPage: React.FC = () => {
     const { setSelectedInternship } = useOutletContext<StudentDashboardContextType>();
     const { internships } = useData();
+    const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [locationFilter, setLocationFilter] = useState('');
     const [jobTypeFilter, setJobTypeFilter] = useState('');
     const [fieldFilter, setFieldFilter] = useState('');
-    const [applyingTo, setApplyingTo] = useState<Internship | null>(null);
+
+    const handleApply = (internship: Internship) => {
+        navigate(`/student/apply/${internship.id}`);
+    };
 
     const filteredInternships = useMemo(() => {
         return internships.filter(internship => {
@@ -84,7 +87,7 @@ const StudentSearchPage: React.FC = () => {
                             key={internship.id}
                             internship={internship}
                             onViewDetails={setSelectedInternship}
-                            onApply={setApplyingTo}
+                            onApply={handleApply}
                         />
                     ))
                 ) : (
@@ -93,13 +96,6 @@ const StudentSearchPage: React.FC = () => {
                     </p>
                 )}
             </div>
-
-            {applyingTo && (
-                <ApplicationFormModal 
-                    internship={applyingTo}
-                    onClose={() => setApplyingTo(null)}
-                />
-            )}
         </div>
     );
 };

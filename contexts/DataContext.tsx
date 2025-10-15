@@ -20,6 +20,7 @@ interface DataContextType {
   deleteInternship: (internshipId: number) => void;
   getApplicationsForCompany: (companyId: number) => Application[];
   applyForInternship: (application: Omit<Application, 'id' | 'status' | 'applicationDate'>) => void;
+  cancelApplication: (applicationId: number) => void;
   getStudentApplications: (studentId: number) => Application[];
 }
 
@@ -87,6 +88,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setApplications(prev => [...prev, newApplication]);
     }, [applications]);
 
+    const cancelApplication = useCallback((applicationId: number) => {
+        setApplications(prev => prev.filter(app => app.id !== applicationId));
+    }, []);
+
     const getStudentApplications = useCallback((studentId: number) => {
         return applications
             .filter(app => app.studentId === studentId)
@@ -109,6 +114,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             deleteInternship,
             getApplicationsForCompany,
             applyForInternship,
+            cancelApplication,
             getStudentApplications
         }}>
             {children}

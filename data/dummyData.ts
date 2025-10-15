@@ -15,9 +15,34 @@ export let internships: Internship[] = [
 ];
 
 export let applications: Application[] = [
-    { id: 1, internshipId: 1, studentId: 1, status: ApplicationStatus.APPLIED, applicationDate: '2024-07-03', coverLetter: 'I am very interested in this position.' },
-    { id: 2, internshipId: 2, studentId: 2, status: ApplicationStatus.ACCEPTED, applicationDate: '2024-07-06' },
-    { id: 3, internshipId: 1, studentId: 2, status: ApplicationStatus.REJECTED, applicationDate: '2024-07-04' },
+    { 
+        id: 1, internshipId: 1, studentId: 1, status: ApplicationStatus.APPLIED, applicationDate: '2024-07-03', 
+        fullName: 'John Doe', studentIdNumber: '123456789', major: 'Computer Science', university: 'Universitas Gadjah Mada',
+        currentSemester: 7, gender: 'Laki-laki', dateOfBirth: '2003-05-15', phoneNumber: '081234567890', activeEmail: 'johndoe@email.com',
+        address: 'Jl. Merdeka No. 1, Yogyakarta', cvFileName: 'JohnDoe_CV.pdf', transcriptFileName: 'JohnDoe_Transcript.pdf',
+        gpa: 3.8, mainSkills: ['React', 'Node.js'], softwareTools: ['VS Code', 'Git'], languages: ['Indonesia', 'English'],
+        reasonForApplying: 'Sangat tertarik dengan pengembangan frontend di TechCorp.', internshipStartDate: '2024-09-01', internshipEndDate: '2024-12-01',
+        preferredWorkType: 'Hybrid', dataAuthenticityConfirmation: true, dataProcessingConsent: true, eSignature: 'John Doe'
+    },
+    { 
+        id: 2, internshipId: 2, studentId: 2, status: ApplicationStatus.ACCEPTED, applicationDate: '2024-07-06',
+        fullName: 'Jane Smith', studentIdNumber: '987654321', major: 'Information Systems', university: 'Institut Teknologi Bandung',
+        currentSemester: 8, gender: 'Perempuan', dateOfBirth: '2002-11-20', phoneNumber: '081234567891', activeEmail: 'janesmith@email.com',
+        address: 'Jl. Asia Afrika No. 10, Bandung', cvFileName: 'JaneSmith_CV.pdf', transcriptFileName: 'JaneSmith_Transcript.pdf',
+        gpa: 3.9, mainSkills: ['UI/UX Design', 'Figma'], softwareTools: ['Figma', 'Adobe XD'], languages: ['Indonesia', 'English'],
+        reasonForApplying: 'Ingin berkontribusi pada desain produk di InnovateHub.', internshipStartDate: '2024-08-15', internshipEndDate: '2025-02-15',
+// FIX: Changed 'Remote' to 'WFH' to match the Application type definition.
+        preferredWorkType: 'WFH', dataAuthenticityConfirmation: true, dataProcessingConsent: true, eSignature: 'Jane Smith'
+    },
+    { 
+        id: 3, internshipId: 1, studentId: 2, status: ApplicationStatus.REJECTED, applicationDate: '2024-07-04',
+        fullName: 'Jane Smith', studentIdNumber: '987654321', major: 'Information Systems', university: 'Institut Teknologi Bandung',
+        currentSemester: 8, gender: 'Perempuan', dateOfBirth: '2002-11-20', phoneNumber: '081234567892', activeEmail: 'janesmith@email.com',
+        address: 'Jl. Asia Afrika No. 10, Bandung', cvFileName: 'JaneSmith_CV.pdf', transcriptFileName: 'JaneSmith_Transcript.pdf',
+        gpa: 3.9, mainSkills: ['UI/UX Design', 'Figma'], softwareTools: ['Figma', 'Adobe XD'], languages: ['Indonesia', 'English'],
+        reasonForApplying: 'Mencoba peruntungan di bidang lain.', internshipStartDate: '2024-09-01', internshipEndDate: '2024-12-01',
+        preferredWorkType: 'Hybrid', dataAuthenticityConfirmation: true, dataProcessingConsent: true, eSignature: 'Jane Smith'
+    },
 ];
 
 export let reviews: Review[] = [

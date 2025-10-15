@@ -21,6 +21,7 @@ import CompanyListingsPage from './pages/CompanyListingsPage';
 import CompanyPostPage from './pages/CompanyPostPage';
 import CompanyCalendarPage from './pages/CompanyCalendarPage';
 import CompanyProfilePage from './pages/CompanyProfilePage';
+import ApplicationFormPage from './pages/ApplicationFormPage';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode; roles: Role[] }> = ({ children, roles }) => {
   const { user } = useAuth();
@@ -51,6 +52,12 @@ const AppContent: React.FC = () => {
                         <Route path="calendar" element={<StudentCalendarPage />} />
                         <Route path="profile" element={<StudentProfilePage />} />
                     </Route>
+                    
+                    <Route path="/student/apply/:internshipId" element={
+                        <PrivateRoute roles={[Role.STUDENT]}>
+                            <ApplicationFormPage />
+                        </PrivateRoute>
+                    } />
 
                     <Route path="/company" element={
                         <PrivateRoute roles={[Role.COMPANY]}>
