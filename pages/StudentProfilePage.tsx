@@ -178,7 +178,7 @@ const StudentProfilePage: React.FC = () => {
                     </div>
                      <div>
                         <label className="block text-sm font-medium text-[#264E86]">Tahun Lulus</label>
-                        <input type="number" name="graduationYear" value={formData.graduationYear} onChange={handleChange} className={formInputStyle} />
+                        <input type="number" name="graduationYear" value={formData.graduationYear} onChange={handleChange} className={formInputStyle} onWheel={(e) => (e.target as HTMLElement).blur()} />
                     </div>
                 </div>
                 <div>

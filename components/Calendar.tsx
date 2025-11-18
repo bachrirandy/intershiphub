@@ -37,7 +37,6 @@ const Calendar: React.FC<CalendarProps> = ({ internships, onEventClick }) => {
 
         for (let day = 1; day <= daysInMonth; day++) {
             const currentDayDate = new Date(year, month, day);
-            const dayString = currentDayDate.toISOString().split('T')[0];
             
             const internshipsOnThisDay = internships.filter(i => {
                 const startDate = new Date(i.postedDate);
@@ -50,14 +49,15 @@ const Calendar: React.FC<CalendarProps> = ({ internships, onEventClick }) => {
             days.push(
                 <div key={day} className="border border-gray-200 p-1.5 h-32 flex flex-col relative">
                     <span className="font-medium text-sm text-[#264E86]">{day}</span>
-                    <div className="flex-grow space-y-1 mt-1 overflow-hidden">
+                    <div className="flex-grow space-y-1 mt-1 overflow-y-auto">
                         {internshipsOnThisDay.map((internship, index) => (
                             <button
                                 key={internship.id}
                                 onClick={() => onEventClick(internship)}
-                                className={`w-full text-left p-1.5 text-xs font-semibold text-white ${eventColors[internship.id % eventColors.length]} rounded-md hover:opacity-80 truncate transition-opacity`}
+                                className={`w-full text-left p-1 text-xs font-semibold text-white ${eventColors[internship.id % eventColors.length]} rounded hover:opacity-80 truncate transition-opacity flex items-center`}
                             >
-                                {internship.postedDate === dayString ? internship.title : <span>&nbsp;</span>}
+                                <div className="w-2 h-2 bg-white/80 rounded-full mr-1.5 flex-shrink-0"></div>
+                                <span className="truncate">{internship.title}</span>
                             </button>
                         ))}
                     </div>

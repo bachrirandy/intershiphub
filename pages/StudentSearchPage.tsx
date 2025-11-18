@@ -6,7 +6,7 @@ import InternshipCard from '../components/InternshipCard';
 import { StudentDashboardContextType } from './StudentDashboard';
 
 const StudentSearchPage: React.FC = () => {
-    const { setSelectedInternship } = useOutletContext<StudentDashboardContextType>();
+    const outletContext = useOutletContext() as StudentDashboardContextType;
     const { internships } = useData();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
@@ -39,6 +39,11 @@ const StudentSearchPage: React.FC = () => {
         const fields = new Set(internships.map(i => i.field));
         return Array.from(fields);
     }, [internships]);
+
+    if (!outletContext) {
+        return null; // or a loading spinner
+    }
+    const { setSelectedInternship } = outletContext;
 
     return (
         <div className="space-y-6">

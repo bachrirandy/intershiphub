@@ -138,15 +138,24 @@ const ApplicationFormPage: React.FC = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
-        
+    
         if (type === 'checkbox') {
             const { checked } = e.target as HTMLInputElement;
             setFormData({ ...formData, [name]: checked });
-        } else if (name === 'mainSkills' || name === 'softwareTools' || name === 'languages') {
-             setFormData({ ...formData, [name]: value.split(',').map(s => s.trim()).filter(Boolean) });
-        } else {
-            setFormData({ ...formData, [name]: value });
+            return;
         }
+
+        let processedValue: any = value;
+        
+        const numericFields = ['gpa', 'currentSemester', 'expectedSalary'];
+
+        if (name === 'mainSkills' || name === 'softwareTools' || name === 'languages') {
+            processedValue = value.split(',').map(s => s.trim()).filter(Boolean);
+        } else if (numericFields.includes(name)) {
+            processedValue = value === '' ? undefined : Number(value);
+        }
+
+        setFormData({ ...formData, [name]: processedValue });
     };
     
     const handleFileChange = (field: keyof typeof files, file: File | null) => {
@@ -228,7 +237,7 @@ const ApplicationFormPage: React.FC = () => {
                         {currentStep === 1 && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div><label className={labelStyle}>Nama Lengkap</label><input type="text" name="fullName" value={formData.fullName} className={formReadonlyStyle} readOnly /></div>
-                                <div><label htmlFor="studentIdNumber" className={labelStyle}>NIM <span className="text-red-500">*</span></label><input type="number" id="studentIdNumber" name="studentIdNumber" value={formData.studentIdNumber || ''} onChange={handleChange} className={formInputStyle('studentIdNumber')} required />{errors.studentIdNumber && <p className="text-red-500 text-xs mt-1">{errors.studentIdNumber}</p>}</div>
+                                <div><label htmlFor="studentIdNumber" className={labelStyle}>NIM <span className="text-red-500">*</span></label><input type="text" id="studentIdNumber" name="studentIdNumber" value={formData.studentIdNumber || ''} onChange={handleChange} className={formInputStyle('studentIdNumber')} required />{errors.studentIdNumber && <p className="text-red-500 text-xs mt-1">{errors.studentIdNumber}</p>}</div>
                                 <div><label className={labelStyle}>Jurusan</label><input type="text" name="major" value={formData.major} className={formReadonlyStyle} readOnly /></div>
                                 <div><label className={labelStyle}>Universitas</label><input type="text" name="university" value={formData.university} className={formReadonlyStyle} readOnly /></div>
                                 <div><label htmlFor="currentSemester" className={labelStyle}>Semester <span className="text-red-500">*</span></label><select id="currentSemester" name="currentSemester" value={formData.currentSemester} onChange={handleChange} className={formSelectStyle('currentSemester')}><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></div>
@@ -253,7 +262,7 @@ const ApplicationFormPage: React.FC = () => {
 
                         {currentStep === 3 && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><label htmlFor="gpa" className={labelStyle}>IPK Terakhir <span className="text-red-500">*</span></label><input type="number" id="gpa" name="gpa" step="0.01" min="0" max="4" value={formData.gpa} onChange={handleChange} className={formInputStyle('gpa')} required />{errors.gpa && <p className="text-red-500 text-xs mt-1">{errors.gpa}</p>}</div>
+                                <div><label htmlFor="gpa" className={labelStyle}>IPK Terakhir <span className="text-red-500">*</span></label><input type="number" id="gpa" name="gpa" step="0.01" min="0" max="4" value={formData.gpa || ''} onChange={handleChange} className={formInputStyle('gpa')} required />{errors.gpa && <p className="text-red-500 text-xs mt-1">{errors.gpa}</p>}</div>
                                 <div><label htmlFor="mainSkills" className={labelStyle}>Keahlian Utama (pisahkan koma)</label><input type="text" id="mainSkills" name="mainSkills" value={Array.isArray(formData.mainSkills) ? formData.mainSkills.join(', ') : ''} onChange={handleChange} className={formInputStyle('mainSkills')} /></div>
                                 <div><label htmlFor="softwareTools" className={labelStyle}>Software/Tools (pisahkan koma)</label><input type="text" id="softwareTools" name="softwareTools" value={Array.isArray(formData.softwareTools) ? formData.softwareTools.join(', ') : ''} onChange={handleChange} className={formInputStyle('softwareTools')} /></div>
                                 <div><label htmlFor="languages" className={labelStyle}>Bahasa (pisahkan koma)</label><input type="text" id="languages" name="languages" value={Array.isArray(formData.languages) ? formData.languages.join(', ') : ''} onChange={handleChange} className={formInputStyle('languages')} /></div>

@@ -7,13 +7,18 @@ import Calendar from '../components/Calendar';
 import { CompanyDashboardContextType } from './CompanyDashboard';
 
 const CompanyCalendarPage: React.FC = () => {
-    const { setSelectedInternship } = useOutletContext<CompanyDashboardContextType>();
+    const outletContext = useOutletContext() as CompanyDashboardContextType;
     const { user } = useAuth();
     const { internships } = useData();
 
     const myInternships = useMemo(() => {
         return internships.filter(i => i.companyId === user?.id);
     }, [internships, user]);
+
+    if (!outletContext) {
+        return null; // or a loading spinner
+    }
+    const { setSelectedInternship } = outletContext;
 
     return (
         <Calendar 

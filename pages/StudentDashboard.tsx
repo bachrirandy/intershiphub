@@ -23,7 +23,7 @@ const StudentDashboard: React.FC = () => {
             <div className="flex flex-col md:flex-row gap-8">
                 <Sidebar role={Role.STUDENT} />
                 <main className="flex-1">
-                    <Outlet context={{ setSelectedInternship } satisfies StudentDashboardContextType} />
+                    <Outlet context={{ setSelectedInternship }} />
                 </main>
             </div>
 

@@ -22,8 +22,11 @@ const LandingPage: React.FC = () => {
     const handleApply = (internship: Internship) => {
         if (!user) {
             openAuthModal({ mode: 'login', role: Role.STUDENT });
-        } else {
+        } else if (user.role === Role.STUDENT) {
             navigate(`/student/apply/${internship.id}`);
+        } else {
+             // Handle case where a company user might click apply
+             navigate('/company');
         }
     };
     
@@ -32,6 +35,36 @@ const LandingPage: React.FC = () => {
             navigate('/student');
         } else {
             openAuthModal({ mode: 'login', role: Role.STUDENT });
+        }
+    };
+
+    const handleCariMagangClick = () => {
+        if (user) {
+            // If logged in, go to the appropriate dashboard
+            if (user.role === Role.STUDENT) {
+                navigate('/student');
+            } else {
+                // Non-students (e.g., companies) also get redirected to their dashboard
+                navigate('/company');
+            }
+        } else {
+            // If not logged in, open registration modal for students
+            openAuthModal({ mode: 'register', role: Role.STUDENT });
+        }
+    };
+
+    const handleRekrutTalentaClick = () => {
+        if (user) {
+            // If logged in, go to the appropriate dashboard
+            if (user.role === Role.COMPANY) {
+                navigate('/company');
+            } else {
+                // Non-companies (e.g., students) also get redirected to their dashboard
+                navigate('/student');
+            }
+        } else {
+            // If not logged in, open registration modal for companies
+            openAuthModal({ mode: 'register', role: Role.COMPANY });
         }
     };
 
@@ -48,13 +81,13 @@ const LandingPage: React.FC = () => {
                     </p>
                     <div className="space-x-4">
                         <button 
-                            onClick={() => openAuthModal({ mode: 'register', role: Role.STUDENT })}
+                            onClick={handleCariMagangClick}
                             className="bg-[#0074E4] text-white font-bold py-3 px-8 rounded-lg hover:bg-[#264E86] transition-transform transform hover:scale-105"
                         >
                             Cari Magang
                         </button>
                         <button 
-                            onClick={() => openAuthModal({ mode: 'register', role: Role.COMPANY })}
+                            onClick={handleRekrutTalentaClick}
                             className="bg-transparent text-[#0074E4] font-bold py-3 px-8 rounded-lg border-2 border-[#0074E4] hover:bg-[#0074E4]/10 transition-transform transform hover:scale-105"
                         >
                             Rekrut Talenta

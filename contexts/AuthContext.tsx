@@ -11,6 +11,7 @@ interface AuthContextType {
   updateStudentProfile: (profile: Partial<User>) => void;
   updateCompanyProfile: (profile: Partial<User>) => void;
   loginWithGoogle: (role: Role) => Promise<User | null>;
+  registerWithGoogle: (role: Role) => Promise<User | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,8 +45,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         email,
         password,
         role,
-        ...(role === Role.STUDENT ? { major: 'Belum diisi', skills: [], cvLink: '' } : {}),
-        ...(role === Role.COMPANY ? { field: 'Belum diisi', description: '' } : {}),
+        ...(role === Role.STUDENT ? {
+            major: '',
+            skills: [],
+            cvLink: '',
+            university: '',
+            graduationYear: new Date().getFullYear() + 4,
+            bio: '',
+            portfolioLink: '',
+            linkedinProfile: '',
+            profilePictureUrl: ''
+        } : {}),
+        ...(role === Role.COMPANY ? {
+            field: '',
+            description: '',
+            logoUrl: '',
+            website: '',
+            location: '',
+            companySize: '1-10 Karyawan',
+            techStack: []
+        } : {}),
       };
       dummyUsers.push(newUser);
       setUser(newUser);
@@ -54,21 +73,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
   
   const loginWithGoogle = async (role: Role): Promise<User | null> => {
-    let foundUser: User | undefined;
-    if (role === Role.STUDENT) {
-        foundUser = dummyUsers.find(u => u.email === 'johndoe@email.com');
-    } else if (role === Role.COMPANY) {
-        foundUser = dummyUsers.find(u => u.email === 'techcorp@email.com');
-    }
+    // This is a dummy implementation. A real one would use a Google Auth library.
+    const googleEmail = `dummy.google.${role}@example.com`;
+    const foundUser = dummyUsers.find(u => u.email === googleEmail && u.role === role);
 
     if (foundUser) {
         setUser(foundUser);
         addToast('Login dengan Google berhasil!', 'success');
         return foundUser;
     } else {
-        addToast('Gagal login dengan Google. Pengguna demo tidak ditemukan.', 'error');
+        addToast('Akun Google tidak ditemukan. Silakan register terlebih dahulu.', 'error');
         return null;
     }
+  };
+
+  const registerWithGoogle = async (role: Role): Promise<User | null> => {
+    // This is a dummy implementation.
+    const googleEmail = `dummy.google.${role}@example.com`;
+    const name = role === Role.STUDENT ? 'Google User' : 'Google Company';
+    // The main `register` function already handles checking for existing users and showing appropriate toasts.
+    const newUser = await register(name, googleEmail, `googleauth${Date.now()}`, role);
+    return newUser;
   };
 
   const logout = () => {
@@ -98,7 +123,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, updateStudentProfile, updateCompanyProfile, loginWithGoogle }}>
+    <AuthContext.Provider value={{ user, login, register, logout, updateStudentProfile, updateCompanyProfile, loginWithGoogle, registerWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );

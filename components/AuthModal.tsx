@@ -25,7 +25,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', initialRol
   const [name, setName] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { login, register, loginWithGoogle } = useAuth();
+  const { login, register, loginWithGoogle, registerWithGoogle } = useAuth();
   const { closeAuthModal } = useModal();
   const { addToast } = useToast();
   const navigate = useNavigate();
@@ -45,13 +45,19 @@ const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', initialRol
       if (!email) newErrors.email = 'Email tidak boleh kosong.';
       else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = 'Format email tidak valid.';
 
-      if (!password) newErrors.password = 'Password tidak boleh kosong.';
-      else {
-          if (password.length < 8) newErrors.password = 'Password minimal 8 karakter.';
-          if (!/[A-Z]/.test(password)) newErrors.password = 'Harus ada min. 1 huruf besar.';
-          if (!/[a-z]/.test(password)) newErrors.password = 'Harus ada min. 1 huruf kecil.';
-          if (!/\d/.test(password)) newErrors.password = 'Harus ada min. 1 angka.';
-          if (!/[^A-Za-z0-9]/.test(password)) newErrors.password = 'Harus ada min. 1 simbol.';
+      if (!password) {
+        newErrors.password = 'Password tidak boleh kosong.';
+      } else {
+        const passwordErrors: string[] = [];
+        if (password.length < 8) passwordErrors.push('minimal 8 karakter');
+        if (!/[A-Z]/.test(password)) passwordErrors.push('minimal 1 huruf besar');
+        if (!/[a-z]/.test(password)) passwordErrors.push('minimal 1 huruf kecil');
+        if (!/\d/.test(password)) passwordErrors.push('minimal 1 angka');
+        if (!/[^A-Za-z0-9]/.test(password)) passwordErrors.push('minimal 1 simbol');
+
+        if (passwordErrors.length > 0) {
+            newErrors.password = `Password harus mengandung: ${passwordErrors.join(', ')}.`;
+        }
       }
 
       if (password !== confirmPassword) newErrors.confirmPassword = 'Password tidak cocok.';
@@ -89,11 +95,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', initialRol
     }
   };
 
-  const handleGoogleLogin = async () => {
-    const loggedInUser = await loginWithGoogle(role);
-    if (loggedInUser) {
-        handleNavigation(loggedInUser.role);
-        closeAuthModal();
+  const handleGoogleAuth = async () => {
+    let user;
+    if (mode === 'login') {
+      user = await loginWithGoogle(role);
+    } else {
+      user = await registerWithGoogle(role);
+    }
+
+    if (user) {
+      handleNavigation(user.role);
+      closeAuthModal();
     }
   };
   
@@ -130,7 +142,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', initialRol
         
         <div className="space-y-4">
             <button
-                onClick={handleGoogleLogin}
+                onClick={handleGoogleAuth}
                 type="button"
                 className="w-full flex items-center justify-center py-2.5 px-4 border border-[#264E86]/20 rounded-md shadow-sm text-sm font-medium text-[#264E86] bg-white hover:bg-[#EFF0F4] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0074E4] transition-colors"
             >
@@ -168,6 +180,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', initialRol
                 Password
             </label>
             <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={getInputStyle('password')} required />
+            {mode === 'register' && !errors.password && (
+                <p className="text-xs text-[#264E86]/60 mt-1">
+                    Min. 8 karakter, 1 huruf besar, 1 huruf kecil, 1 angka, 1 simbol.
+                </p>
+            )}
             {errors.password && <p className="text-red-500 text-xs italic mt-1">{errors.password}</p>}
           </div>
           {mode === 'register' && (
