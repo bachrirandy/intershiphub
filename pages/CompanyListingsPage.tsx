@@ -14,7 +14,7 @@ const statusBorderColor = {
     [ApplicationStatus.ACCEPTED]: 'border-green-500',
     [ApplicationStatus.REJECTED]: 'border-red-500'
 };
-const JobTypeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5 text-[#264E86]/75" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>;
+const JobTypeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5 text-slate-500" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>;
 const TrashIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clipRule="evenodd" /></svg>;
 
 
@@ -50,8 +50,8 @@ const CompanyListingsPage: React.FC = () => {
                 <div key={internship.id} className="bg-white p-6 rounded-lg shadow-md">
                     <div className="flex justify-between items-start">
                         <div>
-                            <h3 className="text-xl font-bold mb-1 text-[#264E86]">{internship.title}</h3>
-                            <div className="flex flex-wrap items-center text-sm text-[#264E86]/75 mb-4 gap-x-4 gap-y-1">
+                            <h3 className="text-xl font-bold mb-1 text-slate-800">{internship.title}</h3>
+                            <div className="flex flex-wrap items-center text-sm text-slate-500 mb-4 gap-x-4 gap-y-1">
                                 <span>{internship.location}</span>
                                 <span className="text-gray-300">&bull;</span>
                                 <span>{internship.duration}</span>
@@ -68,14 +68,14 @@ const CompanyListingsPage: React.FC = () => {
                         </button>
                     </div>
 
-                    <h4 className="font-semibold mb-2 text-[#264E86]">Pelamar:</h4>
+                    <h4 className="font-semibold mb-2 text-slate-700">Pelamar:</h4>
                     <div className="space-y-3">
                         {allApplicants.filter(a => a.internshipId === internship.id).length > 0 ? (
                             allApplicants.filter(a => a.internshipId === internship.id).map(app => (
-                                <div key={app.id} className={`p-4 border-l-4 ${statusBorderColor[app.status]} rounded-r-md bg-[#EFF0F4] flex items-center justify-between`}>
+                                <div key={app.id} className={`p-4 border-l-4 ${statusBorderColor[app.status]} rounded-r-md bg-slate-50 flex items-center justify-between`}>
                                     <div>
-                                        <p className="font-semibold text-[#264E86]">{app.student?.name}</p>
-                                        <a href={app.student?.cvLink} target="_blank" rel="noopener noreferrer" className="text-sm text-[#0074E4] hover:underline">
+                                        <p className="font-semibold text-slate-800">{app.student?.name}</p>
+                                        <a href={app.student?.cvLink} target="_blank" rel="noopener noreferrer" className="text-sm text-brand-primary hover:underline">
                                             Lihat CV
                                         </a>
                                     </div>
@@ -84,7 +84,7 @@ const CompanyListingsPage: React.FC = () => {
                                         <select
                                             value={app.status}
                                             onChange={e => handleStatusChange(app.id, e.target.value as ApplicationStatus)}
-                                            className="text-sm border-[#264E86]/20 rounded-md focus:ring-[#0074E4] focus:border-[#0074E4] bg-white text-[#264E86]"
+                                            className="text-sm border-slate-300 rounded-md focus:ring-brand-primary focus:border-brand-primary bg-white text-slate-800"
                                         >
                                             <option value={ApplicationStatus.APPLIED}>Applied</option>
                                             <option value={ApplicationStatus.ACCEPTED}>Accepted</option>
@@ -94,11 +94,11 @@ const CompanyListingsPage: React.FC = () => {
                                 </div>
                             ))
                         ) : (
-                            <p className="text-[#264E86]/75 text-sm">Belum ada pelamar.</p>
+                            <p className="text-slate-500 text-sm">Belum ada pelamar.</p>
                         )}
                     </div>
                 </div>
-            )) : <p className="text-[#264E86]/75 bg-white p-6 rounded-lg shadow-md">Anda belum memposting lowongan internship.</p>}
+            )) : <p className="text-slate-500 bg-white p-6 rounded-lg shadow-md">Anda belum memposting lowongan internship.</p>}
         </div>
     );
 };

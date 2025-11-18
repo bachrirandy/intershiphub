@@ -6,7 +6,7 @@ import { JobType } from '../types';
 
 const ChevronLeftIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>;
 const ChevronRightIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>;
-const CalendarIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#264E86]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>;
+const CalendarIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>;
 
 const DatePicker: React.FC<{ value: string; onChange: (date: string) => void }> = ({ value, onChange }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -56,7 +56,7 @@ const DatePicker: React.FC<{ value: string; onChange: (date: string) => void }> 
                     onClick={() => handleDateSelect(day)}
                     type="button"
                     className={`w-10 h-10 flex items-center justify-center rounded-full text-sm transition-colors ${
-                        isSelected ? 'bg-[#0074E4] text-white' : 'text-[#264E86] hover:bg-[#EFF0F4]'
+                        isSelected ? 'bg-brand-primary text-white' : 'text-slate-700 hover:bg-slate-100'
                     }`}
                 >
                     {day}
@@ -71,7 +71,7 @@ const DatePicker: React.FC<{ value: string; onChange: (date: string) => void }> 
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="mt-1 relative w-full border border-[#264E86]/20 rounded-md shadow-sm py-2 px-3 bg-white text-left text-[#264E86]"
+                className="mt-1 relative w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 bg-white text-left text-slate-800"
             >
                 <span>{value}</span>
                 <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -79,13 +79,13 @@ const DatePicker: React.FC<{ value: string; onChange: (date: string) => void }> 
                 </span>
             </button>
             {isOpen && (
-                <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md p-4 border border-[#264E86]/10">
+                <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md p-4 border border-slate-100">
                     <div className="flex justify-between items-center mb-2">
-                        <button type="button" onClick={() => changeMonth(-1)} className="p-2 rounded-full hover:bg-[#EFF0F4]"><ChevronLeftIcon /></button>
-                        <span className="font-semibold text-[#264E86]">{viewDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
-                        <button type="button" onClick={() => changeMonth(1)} className="p-2 rounded-full hover:bg-[#EFF0F4]"><ChevronRightIcon /></button>
+                        <button type="button" onClick={() => changeMonth(-1)} className="p-2 rounded-full hover:bg-slate-100"><ChevronLeftIcon /></button>
+                        <span className="font-semibold text-slate-700">{viewDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
+                        <button type="button" onClick={() => changeMonth(1)} className="p-2 rounded-full hover:bg-slate-100"><ChevronRightIcon /></button>
                     </div>
-                    <div className="grid grid-cols-7 gap-1 text-center text-xs text-[#264E86]/70 mb-2">
+                    <div className="grid grid-cols-7 gap-1 text-center text-xs text-slate-500 mb-2">
                         {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => <div key={d}>{d}</div>)}
                     </div>
                     <div className="grid grid-cols-7 gap-1 place-items-center">
@@ -151,40 +151,40 @@ const CompanyPostPage: React.FC = () => {
     
     return (
         <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-4 text-[#264E86]">Buat Lowongan Internship Baru</h2>
+            <h2 className="text-2xl font-bold mb-4 text-slate-800">Buat Lowongan Internship Baru</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-[#264E86]">Judul Posisi</label>
-                        <input type="text" name="title" value={formData.title} onChange={handleChange} className="mt-1 block w-full border border-[#264E86]/20 rounded-md shadow-sm py-2 px-3 bg-white text-[#264E86]" required />
+                        <label className="block text-sm font-medium text-slate-700">Judul Posisi</label>
+                        <input type="text" name="title" value={formData.title} onChange={handleChange} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 bg-white text-slate-800" required />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-[#264E86]">Bidang</label>
-                        <input type="text" name="field" value={formData.field} onChange={handleChange} className="mt-1 block w-full border border-[#264E86]/20 rounded-md shadow-sm py-2 px-3 bg-white text-[#264E86]" placeholder="e.g., Software Engineering" required />
+                        <label className="block text-sm font-medium text-slate-700">Bidang</label>
+                        <input type="text" name="field" value={formData.field} onChange={handleChange} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 bg-white text-slate-800" placeholder="e.g., Software Engineering" required />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-[#264E86]">Lokasi</label>
-                        <input type="text" name="location" value={formData.location} onChange={handleChange} className="mt-1 block w-full border border-[#264E86]/20 rounded-md shadow-sm py-2 px-3 bg-white text-[#264E86]" required />
+                        <label className="block text-sm font-medium text-slate-700">Lokasi</label>
+                        <input type="text" name="location" value={formData.location} onChange={handleChange} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 bg-white text-slate-800" required />
                     </div>
                      <div>
-                        <label className="block text-sm font-medium text-[#264E86]">Tanggal Posting</label>
+                        <label className="block text-sm font-medium text-slate-700">Tanggal Posting</label>
                         <DatePicker value={formData.postedDate} onChange={(date) => handleDateChange('postedDate', date)} />
                     </div>
                      <div>
-                        <label className="block text-sm font-medium text-[#264E86]">Tanggal Penutupan</label>
+                        <label className="block text-sm font-medium text-slate-700">Tanggal Penutupan</label>
                         <DatePicker value={formData.closingDate} onChange={(date) => handleDateChange('closingDate', date)} />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-[#264E86]">Tipe Pekerjaan</label>
-                        <select name="jobType" value={formData.jobType} onChange={handleChange} className="mt-1 block w-full border border-[#264E86]/20 rounded-md shadow-sm py-2 px-3 bg-white text-[#264E86]">
+                        <label className="block text-sm font-medium text-slate-700">Tipe Pekerjaan</label>
+                        <select name="jobType" value={formData.jobType} onChange={handleChange} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 bg-white text-slate-800">
                             <option value={JobType.ONSITE}>On-site</option>
                             <option value={JobType.REMOTE}>Remote</option>
                             <option value={JobType.HYBRID}>Hybrid</option>
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-[#264E86]">Durasi</label>
-                        <select name="duration" value={formData.duration} onChange={handleChange} className="mt-1 block w-full border border-[#264E86]/20 rounded-md shadow-sm py-2 px-3 bg-white text-[#264E86]">
+                        <label className="block text-sm font-medium text-slate-700">Durasi</label>
+                        <select name="duration" value={formData.duration} onChange={handleChange} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 bg-white text-slate-800">
                             <option>3 Months</option>
                             <option>6 Months</option>
                             <option>1 Year</option>
@@ -192,14 +192,14 @@ const CompanyPostPage: React.FC = () => {
                     </div>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-[#264E86]">Deskripsi</label>
-                    <textarea name="description" value={formData.description} onChange={handleChange} rows={4} className="mt-1 block w-full border border-[#264E86]/20 rounded-md shadow-sm py-2 px-3 bg-white text-[#264E86]" required />
+                    <label className="block text-sm font-medium text-slate-700">Deskripsi</label>
+                    <textarea name="description" value={formData.description} onChange={handleChange} rows={4} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 bg-white text-slate-800" required />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-[#264E86]">Requirements (pisahkan dengan koma)</label>
-                    <input type="text" name="requirements" value={formData.requirements} onChange={handleChange} className="mt-1 block w-full border border-[#264E86]/20 rounded-md shadow-sm py-2 px-3 bg-white text-[#264E86]" required />
+                    <label className="block text-sm font-medium text-slate-700">Requirements (pisahkan dengan koma)</label>
+                    <input type="text" name="requirements" value={formData.requirements} onChange={handleChange} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 bg-white text-slate-800" required />
                 </div>
-                <button type="submit" className="px-4 py-2 bg-[#0074E4] text-white rounded-md hover:bg-[#264E86]">Post Lowongan</button>
+                <button type="submit" className="px-4 py-2 bg-brand-primary text-white rounded-md hover:bg-brand-dark">Post Lowongan</button>
             </form>
         </div>
     );

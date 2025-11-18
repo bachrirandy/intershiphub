@@ -10,8 +10,8 @@ interface AuthContextType {
   logout: () => void;
   updateStudentProfile: (profile: Partial<User>) => void;
   updateCompanyProfile: (profile: Partial<User>) => void;
-  loginWithGoogle: (role: Role) => Promise<User | null>;
-  registerWithGoogle: (role: Role) => Promise<User | null>;
+  loginWithGoogle: (role: Role, email?: string) => Promise<User | null>;
+  registerWithGoogle: (role: Role, email?: string, name?: string) => Promise<User | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -68,18 +68,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       };
       dummyUsers.push(newUser);
       setUser(newUser);
-      addToast('Registrasi berhasil!', 'success');
+      addToast('Registrasi berhasil! Selamat datang.', 'success');
       return newUser;
   };
   
-  const loginWithGoogle = async (role: Role): Promise<User | null> => {
-    // This is a dummy implementation. A real one would use a Google Auth library.
-    const googleEmail = `dummy.google.${role}@example.com`;
-    const foundUser = dummyUsers.find(u => u.email === googleEmail && u.role === role);
+  const loginWithGoogle = async (role: Role, email?: string): Promise<User | null> => {
+    // Simulated Google Auth
+    // If email is provided (from the simulation modal), try to find that user.
+    // Otherwise fallback to a demo behavior (though UI should now prevent this).
+    const targetEmail = email; 
+    
+    if (!targetEmail) {
+         addToast('Silakan masukkan email Google Anda.', 'error');
+         return null;
+    }
+
+    const foundUser = dummyUsers.find(u => u.email === targetEmail && u.role === role);
 
     if (foundUser) {
         setUser(foundUser);
-        addToast('Login dengan Google berhasil!', 'success');
+        addToast(`Login Google berhasil! Selamat datang, ${foundUser.name}.`, 'success');
         return foundUser;
     } else {
         addToast('Akun Google tidak ditemukan. Silakan register terlebih dahulu.', 'error');
@@ -87,17 +95,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const registerWithGoogle = async (role: Role): Promise<User | null> => {
-    // This is a dummy implementation.
-    const googleEmail = `dummy.google.${role}@example.com`;
-    const name = role === Role.STUDENT ? 'Google User' : 'Google Company';
+  const registerWithGoogle = async (role: Role, email?: string, name?: string): Promise<User | null> => {
+    const targetEmail = email;
+    const targetName = name || (role === Role.STUDENT ? 'Pengguna Google' : 'Perusahaan Google');
+
+    if (!targetEmail) {
+        addToast('Silakan lengkapi data Google Anda.', 'error');
+        return null;
+    }
+
     // The main `register` function already handles checking for existing users and showing appropriate toasts.
-    const newUser = await register(name, googleEmail, `googleauth${Date.now()}`, role);
+    // We use a dummy password for OAuth users internally
+    const newUser = await register(targetName, targetEmail, `google-oauth-${Date.now()}`, role);
     return newUser;
   };
 
   const logout = () => {
     setUser(null);
+    addToast('Anda telah logout.', 'info');
   };
 
   const updateStudentProfile = (profile: Partial<User>) => {

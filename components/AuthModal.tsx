@@ -16,7 +16,18 @@ const GoogleIcon: React.FC = () => (
     </svg>
 );
 
+const CheckIcon = () => <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>;
+const XIcon = () => <svg className="w-4 h-4 text-slate-300 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>;
+
+const PasswordReq: React.FC<{ met: boolean; text: string }> = ({ met, text }) => (
+  <div className={`flex items-center text-xs ${met ? 'text-green-600 font-bold' : 'text-slate-400'}`}>
+      {met ? <CheckIcon /> : <XIcon />}
+      {text}
+  </div>
+);
+
 const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', initialRole = Role.STUDENT }) => {
+  const [view, setView] = useState<'main' | 'google'>('main');
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
   const [role, setRole] = useState<Role>(initialRole);
   const [email, setEmail] = useState('');
@@ -24,6 +35,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', initialRol
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Google Simulation State
+  const [googleEmail, setGoogleEmail] = useState('');
+  const [googleName, setGoogleName] = useState('');
 
   const { login, register, loginWithGoogle, registerWithGoogle } = useAuth();
   const { closeAuthModal } = useModal();
@@ -33,7 +48,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', initialRol
   useEffect(() => {
     setMode(initialMode);
     setRole(initialRole);
-    setErrors({}); // Reset errors on mode/role change
+    setErrors({});
+    setView('main');
+    setGoogleEmail('');
+    setGoogleName('');
   }, [initialMode, initialRole]);
   
   const validate = () => {
@@ -45,19 +63,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', initialRol
       if (!email) newErrors.email = 'Email tidak boleh kosong.';
       else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = 'Format email tidak valid.';
 
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
       if (!password) {
         newErrors.password = 'Password tidak boleh kosong.';
-      } else {
-        const passwordErrors: string[] = [];
-        if (password.length < 8) passwordErrors.push('minimal 8 karakter');
-        if (!/[A-Z]/.test(password)) passwordErrors.push('minimal 1 huruf besar');
-        if (!/[a-z]/.test(password)) passwordErrors.push('minimal 1 huruf kecil');
-        if (!/\d/.test(password)) passwordErrors.push('minimal 1 angka');
-        if (!/[^A-Za-z0-9]/.test(password)) passwordErrors.push('minimal 1 simbol');
-
-        if (passwordErrors.length > 0) {
-            newErrors.password = `Password harus mengandung: ${passwordErrors.join(', ')}.`;
-        }
+      } else if (!passwordRegex.test(password)) {
+        newErrors.password = 'Password belum memenuhi syarat.';
       }
 
       if (password !== confirmPassword) newErrors.confirmPassword = 'Password tidak cocok.';
@@ -77,10 +87,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', initialRol
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (mode === 'register' && !validate()) {
-      addToast('Harap perbaiki error pada form.', 'error');
-      return;
-    }
+    if (mode === 'register' && !validate()) return;
 
     let loggedInUser;
     if (mode === 'login') {
@@ -95,124 +102,176 @@ const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', initialRol
     }
   };
 
-  const handleGoogleAuth = async () => {
-    let user;
-    if (mode === 'login') {
-      user = await loginWithGoogle(role);
-    } else {
-      user = await registerWithGoogle(role);
-    }
+  const handleGoogleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      let user;
+      if (mode === 'login') {
+          user = await loginWithGoogle(role, googleEmail);
+      } else {
+          user = await registerWithGoogle(role, googleEmail, googleName);
+      }
 
-    if (user) {
-      handleNavigation(user.role);
-      closeAuthModal();
-    }
+      if (user) {
+          handleNavigation(user.role);
+          closeAuthModal();
+      }
   };
   
-  const getInputStyle = (field: string) => `shadow appearance-none border rounded w-full py-2 px-3 text-[#264E86] bg-white leading-tight focus:outline-none focus:ring-2 focus:ring-[#0074E4] ${errors[field] ? 'border-red-500' : 'border-gray-300'}`;
+  const getInputStyle = (field: string) => `w-full px-4 py-3 rounded-lg bg-slate-50 border focus:bg-white transition-colors outline-none ${errors[field] ? 'border-red-400 focus:ring-2 focus:ring-red-200' : 'border-slate-200 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20'}`;
+
+  const passwordRequirements = [
+      { id: 1, text: "8+ Karakter", met: password.length >= 8 },
+      { id: 2, text: "Huruf Besar", met: /[A-Z]/.test(password) },
+      { id: 3, text: "Angka", met: /\d/.test(password) },
+      { id: 4, text: "Simbol", met: /[^A-Za-z0-9]/.test(password) },
+  ];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in" role="dialog" aria-modal="true">
-      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md relative animate-scale-in">
-        <button onClick={closeAuthModal} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-fade-in" onClick={closeAuthModal}></div>
+      
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl relative flex overflow-hidden animate-scale-in max-h-[90vh]">
+        <button onClick={closeAuthModal} className="absolute top-4 right-4 z-20 p-2 bg-white/80 hover:bg-white rounded-full text-slate-500 hover:text-red-500 transition-all shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
 
-        <h2 className="text-2xl font-bold text-center text-[#264E86] mb-2">
-          {mode === 'login' ? 'Selamat Datang Kembali' : 'Buat Akun Baru'}
-        </h2>
-        <p className="text-center text-[#264E86]/75 mb-6">{mode === 'login' ? 'Login untuk melanjutkan' : 'Daftar sebagai'}</p>
+        {/* Left Side - Form */}
+        <div className="w-full lg:w-1/2 p-8 md:p-12 overflow-y-auto">
+             {view === 'main' && (
+                <>
+                    <div className="mb-8">
+                        <h2 className="text-3xl font-heading font-bold text-slate-900 mb-2">
+                            {mode === 'login' ? 'Selamat Datang' : 'Mulai Perjalananmu'}
+                        </h2>
+                        <p className="text-slate-500">
+                            {mode === 'login' ? 'Masuk untuk mengakses dashboard Anda.' : 'Buat akun baru dalam hitungan detik.'}
+                        </p>
+                    </div>
 
-        <div className="flex justify-center mb-6 border border-[#264E86]/20 rounded-lg p-1">
-          <button
-            onClick={() => setRole(Role.STUDENT)}
-            className={`w-1/2 py-2 rounded-md text-sm font-medium transition-colors ${role === Role.STUDENT ? 'bg-[#0074E4] text-white' : 'text-[#264E86] hover:bg-[#EFF0F4]'}`}
-          >
-            Mahasiswa
-          </button>
-          <button
-            onClick={() => setRole(Role.COMPANY)}
-            className={`w-1/2 py-2 rounded-md text-sm font-medium transition-colors ${role === Role.COMPANY ? 'bg-[#0074E4] text-white' : 'text-[#264E86] hover:bg-[#EFF0F4]'}`}
-          >
-            Perusahaan
-          </button>
+                    <div className="flex p-1 bg-slate-100 rounded-xl mb-8">
+                        <button onClick={() => setRole(Role.STUDENT)} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${role === Role.STUDENT ? 'bg-white text-brand-primary shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+                            Mahasiswa
+                        </button>
+                        <button onClick={() => setRole(Role.COMPANY)} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${role === Role.COMPANY ? 'bg-white text-brand-primary shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+                            Perusahaan
+                        </button>
+                    </div>
+                    
+                    <button onClick={() => setView('google')} className="w-full flex items-center justify-center gap-3 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors mb-6 group">
+                        <GoogleIcon />
+                        <span className="font-medium text-slate-700 group-hover:text-slate-900">{mode === 'login' ? 'Masuk dengan Google' : 'Daftar dengan Google'}</span>
+                    </button>
+
+                    <div className="relative mb-6">
+                        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200"></div></div>
+                        <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-4 text-slate-400 font-medium tracking-wider">atau email</span></div>
+                    </div>
+
+                    <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                        {mode === 'register' && (
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nama {role === Role.STUDENT ? 'Lengkap' : 'Perusahaan'}</label>
+                                <input type="text" value={name} onChange={(e) => setName(e.target.value)} className={getInputStyle('name')} placeholder="Contoh: Budi Santoso" />
+                                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                            </div>
+                        )}
+                        <div>
+                             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Alamat Email</label>
+                            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={getInputStyle('email')} placeholder="nama@email.com" />
+                            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                        </div>
+                        <div>
+                             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
+                            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={getInputStyle('password')} placeholder="••••••••" />
+                            {mode === 'register' && (
+                                <div className="mt-2 grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                    {passwordRequirements.map(req => <PasswordReq key={req.id} met={req.met} text={req.text} />)}
+                                </div>
+                            )}
+                             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                        </div>
+                        {mode === 'register' && (
+                            <div>
+                                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">Konfirmasi Password</label>
+                                <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={getInputStyle('confirmPassword')} placeholder="••••••••" />
+                                {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
+                            </div>
+                        )}
+                        
+                        <button type="submit" className="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand-primary/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 mt-2">
+                            {mode === 'login' ? 'Masuk Akun' : 'Buat Akun Gratis'}
+                        </button>
+                    </form>
+
+                    <div className="mt-8 text-center">
+                        <p className="text-slate-500 text-sm">
+                            {mode === 'login' ? "Belum punya akun? " : "Sudah punya akun? "}
+                            <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} className="font-bold text-brand-primary hover:text-brand-dark hover:underline transition-colors">
+                                {mode === 'login' ? 'Daftar Sekarang' : 'Login disini'}
+                            </button>
+                        </p>
+                    </div>
+                </>
+             )}
+
+             {/* Simulated Google View */}
+             {view === 'google' && (
+                <div className="animate-fade-in h-full flex flex-col justify-center">
+                    <div className="text-center mb-8">
+                        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                             <GoogleIcon />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900">Simulasi Google Auth</h3>
+                        <p className="text-slate-500 text-sm mt-2">Pilih akun untuk melanjutkan ke InternshipHub</p>
+                    </div>
+                    <form onSubmit={handleGoogleSubmit} className="space-y-5">
+                         <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email Google</label>
+                            <input type="email" value={googleEmail} onChange={(e) => setGoogleEmail(e.target.value)} className={getInputStyle('googleEmail')} placeholder="user@gmail.com" autoFocus required />
+                        </div>
+                        {mode === 'register' && (
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nama Tampilan</label>
+                                <input type="text" value={googleName} onChange={(e) => setGoogleName(e.target.value)} className={getInputStyle('googleName')} placeholder={role === Role.STUDENT ? "Nama Lengkap" : "Nama Perusahaan"} required />
+                            </div>
+                        )}
+                        <div className="flex gap-3 pt-4">
+                            <button type="button" onClick={() => setView('main')} className="flex-1 bg-white border border-slate-300 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-50">Batal</button>
+                            <button type="submit" className="flex-1 bg-brand-primary text-white font-bold py-3 rounded-xl shadow-lg hover:bg-brand-dark">Lanjutkan</button>
+                        </div>
+                    </form>
+                </div>
+             )}
         </div>
-        
-        <div className="space-y-4">
-            <button
-                onClick={handleGoogleAuth}
-                type="button"
-                className="w-full flex items-center justify-center py-2.5 px-4 border border-[#264E86]/20 rounded-md shadow-sm text-sm font-medium text-[#264E86] bg-white hover:bg-[#EFF0F4] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0074E4] transition-colors"
-            >
-                <GoogleIcon />
-                <span>{mode === 'login' ? 'Login dengan Google' : 'Daftar dengan Google'}</span>
-            </button>
 
-            <div className="my-4 flex items-center">
-                <div className="flex-grow border-t border-[#264E86]/20"></div>
-                <span className="flex-shrink mx-4 text-[#264E86]/75 text-xs uppercase">OR</span>
-                <div className="flex-grow border-t border-[#264E86]/20"></div>
+        {/* Right Side - Creative Visual */}
+        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-brand-dark via-brand-primary to-brand-purple relative items-center justify-center p-12 text-white overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-full opacity-20">
+                <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                     <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white" />
+                </svg>
             </div>
-        </div>
-
-
-        <form onSubmit={handleSubmit} noValidate>
-          {mode === 'register' && (
-            <div className="mb-4">
-              <label className="block text-[#264E86] text-sm font-bold mb-2" htmlFor="name">
-                Nama {role === Role.STUDENT ? 'Lengkap' : 'Perusahaan'}
-              </label>
-              <input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} className={getInputStyle('name')} required />
-              {errors.name && <p className="text-red-500 text-xs italic mt-1">{errors.name}</p>}
-            </div>
-          )}
-          <div className="mb-4">
-            <label className="block text-[#264E86] text-sm font-bold mb-2" htmlFor="email">
-              Email
-            </label>
-            <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={getInputStyle('email')} required />
-            {errors.email && <p className="text-red-500 text-xs italic mt-1">{errors.email}</p>}
-          </div>
-          <div className="mb-4">
-            <label className="block text-[#264E86] text-sm font-bold mb-2" htmlFor="password">
-                Password
-            </label>
-            <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={getInputStyle('password')} required />
-            {mode === 'register' && !errors.password && (
-                <p className="text-xs text-[#264E86]/60 mt-1">
-                    Min. 8 karakter, 1 huruf besar, 1 huruf kecil, 1 angka, 1 simbol.
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-brand-accent rounded-full blur-3xl opacity-40 animate-blob"></div>
+            <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-brand-purple rounded-full blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
+            
+            <div className="relative z-10 max-w-md text-center">
+                <div className="mb-8 inline-flex p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                    <div className="text-4xl">🚀</div>
+                </div>
+                <h3 className="text-3xl font-heading font-bold mb-4 leading-tight">
+                    "Platform terbaik untuk memulai karir impianmu."
+                </h3>
+                <p className="text-brand-light text-lg mb-8 font-light">
+                    Bergabung dengan 10,000+ mahasiswa dan 500+ perusahaan top di Indonesia.
                 </p>
-            )}
-            {errors.password && <p className="text-red-500 text-xs italic mt-1">{errors.password}</p>}
-          </div>
-          {mode === 'register' && (
-            <div className="mb-6">
-              <label className="block text-[#264E86] text-sm font-bold mb-2" htmlFor="confirm-password">
-                  Konfirmasi Password
-              </label>
-              <input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={getInputStyle('confirmPassword')} required />
-              {errors.confirmPassword && <p className="text-red-500 text-xs italic mt-1">{errors.confirmPassword}</p>}
+                
+                <div className="flex items-center justify-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-white"></div>
+                    <div className="w-2 h-2 rounded-full bg-white/50"></div>
+                    <div className="w-2 h-2 rounded-full bg-white/50"></div>
+                </div>
             </div>
-          )}
-          <button
-            type="submit"
-            className="w-full bg-[#0074E4] hover:bg-[#264E86] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors"
-          >
-            {mode === 'login' ? 'Login' : 'Register'}
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-[#264E86]/80 mt-6">
-          {mode === 'login' ? "Belum punya akun? " : "Sudah punya akun? "}
-          <button
-            onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
-            className="font-medium text-[#0074E4] hover:text-[#264E86]"
-          >
-            {mode === 'login' ? 'Register' : 'Login'}
-          </button>
-        </p>
+        </div>
       </div>
     </div>
   );

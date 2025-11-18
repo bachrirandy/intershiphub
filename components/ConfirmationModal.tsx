@@ -12,7 +12,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ onClose, onConfir
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fade-in" onClick={onClose} role="dialog" aria-modal="true">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-lg relative animate-scale-in" onClick={e => e.stopPropagation()}>
                 <div className="p-6 border-b">
-                    <h2 className="text-xl font-bold text-[#264E86]">{title}</h2>
+                    <h2 className="text-xl font-bold text-slate-800">{title}</h2>
                 </div>
 
                 <div className="p-6">
@@ -23,7 +23,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ onClose, onConfir
                     <button onClick={onClose} className="px-4 py-2 bg-white text-gray-700 rounded-md border border-gray-300 hover:bg-gray-50">
                         Batalkan
                     </button>
-                    <button onClick={onConfirm} className="px-4 py-2 bg-[#0074E4] text-white rounded-md hover:bg-[#264E86]">
+                    <button onClick={onConfirm} className="px-4 py-2 bg-brand-primary text-white rounded-md hover:bg-brand-dark">
                         Konfirmasi & Kirim
                     </button>
                 </div>

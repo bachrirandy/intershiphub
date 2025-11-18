@@ -28,16 +28,20 @@ const Calendar: React.FC<CalendarProps> = ({ internships, onEventClick }) => {
         const firstDayOfMonth = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         
-        const eventColors = ['bg-[#0074E4]', 'bg-[#264E86]', 'bg-[#74DBEF]'];
+        const today = new Date();
+        
+        // Use new brand colors for events
+        const eventColors = ['bg-brand-primary', 'bg-brand-dark', 'bg-brand-accent'];
 
         const days = [];
         for (let i = 0; i < firstDayOfMonth; i++) {
-            days.push(<div key={`blank-${i}`} className="border border-gray-200 bg-gray-50"></div>);
+            days.push(<div key={`blank-${i}`} className="border border-slate-100 bg-slate-50/50"></div>);
         }
 
         for (let day = 1; day <= daysInMonth; day++) {
             const currentDayDate = new Date(year, month, day);
-            
+            const isToday = currentDayDate.toDateString() === today.toDateString();
+
             const internshipsOnThisDay = internships.filter(i => {
                 const startDate = new Date(i.postedDate);
                 startDate.setHours(0,0,0,0);
@@ -47,16 +51,22 @@ const Calendar: React.FC<CalendarProps> = ({ internships, onEventClick }) => {
             });
 
             days.push(
-                <div key={day} className="border border-gray-200 p-1.5 h-32 flex flex-col relative">
-                    <span className="font-medium text-sm text-[#264E86]">{day}</span>
-                    <div className="flex-grow space-y-1 mt-1 overflow-y-auto">
+                <div key={day} className={`border border-slate-100 p-1.5 h-32 flex flex-col relative ${isToday ? 'bg-blue-50/80 ring-1 ring-inset ring-brand-primary/20' : 'bg-white'}`}>
+                     <div className="flex justify-between items-start">
+                        <span className={`font-bold text-sm w-7 h-7 flex items-center justify-center rounded-full ${isToday ? 'bg-brand-primary text-white shadow-sm' : 'text-slate-700'}`}>
+                            {day}
+                        </span>
+                        {isToday && <span className="text-[10px] font-bold text-brand-primary uppercase tracking-wide">Today</span>}
+                     </div>
+                    
+                    <div className="flex-grow space-y-1.5 mt-2 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 pr-1">
                         {internshipsOnThisDay.map((internship, index) => (
                             <button
                                 key={internship.id}
                                 onClick={() => onEventClick(internship)}
-                                className={`w-full text-left p-1 text-xs font-semibold text-white ${eventColors[internship.id % eventColors.length]} rounded hover:opacity-80 truncate transition-opacity flex items-center`}
+                                className={`w-full text-left px-2 py-1 text-[10px] font-bold text-white ${eventColors[internship.id % eventColors.length]} rounded-md hover:opacity-90 truncate transition-all shadow-sm hover:shadow flex items-center`}
                             >
-                                <div className="w-2 h-2 bg-white/80 rounded-full mr-1.5 flex-shrink-0"></div>
+                                <div className="w-1.5 h-1.5 bg-white/80 rounded-full mr-1.5 flex-shrink-0"></div>
                                 <span className="truncate">{internship.title}</span>
                             </button>
                         ))}
@@ -67,22 +77,40 @@ const Calendar: React.FC<CalendarProps> = ({ internships, onEventClick }) => {
         return days;
     };
     
-    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const weekdays = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex justify-between items-center mb-4">
-                <button onClick={() => changeMonth(-1)} className="p-2 rounded-full hover:bg-[#EFF0F4] text-[#264E86]"><ChevronLeftIcon/></button>
-                <h2 className="text-2xl font-bold text-[#264E86]">
-                    {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+        <div className="bg-white p-6 rounded-2xl shadow-soft border border-slate-100">
+            <div className="flex justify-between items-center mb-6">
+                <button onClick={() => changeMonth(-1)} className="p-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors"><ChevronLeftIcon/></button>
+                <h2 className="text-2xl font-heading font-bold text-slate-900">
+                    {currentDate.toLocaleString('id-ID', { month: 'long', year: 'numeric' })}
                 </h2>
-                <button onClick={() => changeMonth(1)} className="p-2 rounded-full hover:bg-[#EFF0F4] text-[#264E86]"><ChevronRightIcon/></button>
+                <button onClick={() => changeMonth(1)} className="p-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors"><ChevronRightIcon/></button>
             </div>
-            <div className="grid grid-cols-7">
-                {weekdays.map(day => <div key={day} className="text-center font-bold text-[#264E86]/80 p-2 border-b-2 border-gray-200">{day}</div>)}
+            
+            <div className="grid grid-cols-7 mb-2">
+                {weekdays.map(day => (
+                    <div key={day} className="text-center font-bold text-slate-400 text-xs uppercase tracking-wider py-2">
+                        {day}
+                    </div>
+                ))}
             </div>
-            <div className="grid grid-cols-7 min-h-[48rem]">
+            
+            <div className="grid grid-cols-7 min-h-[40rem] rounded-xl overflow-hidden border border-slate-200 shadow-inner bg-slate-50">
                 {renderCalendar()}
+            </div>
+            
+            <div className="mt-6 flex items-center gap-6 text-sm text-slate-600 pt-4 border-t border-slate-100">
+                <span className="font-bold text-slate-800">Legenda:</span>
+                <div className="flex items-center">
+                    <div className="w-3 h-3 bg-brand-primary rounded mr-2"></div>
+                    <span>Lowongan Aktif</span>
+                </div>
+                 <div className="flex items-center">
+                    <div className="w-3 h-3 bg-blue-50 border border-brand-primary rounded mr-2"></div>
+                    <span>Hari Ini</span>
+                </div>
             </div>
         </div>
     );

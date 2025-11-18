@@ -16,13 +16,18 @@ const StudentDashboard: React.FC = () => {
     if (!user) return null;
 
     return (
-        <div className="container mx-auto px-6 py-8 animate-fade-in-slide-up">
-            <h1 className="text-3xl font-bold text-[#264E86] mb-2">Selamat Datang, {user.name}</h1>
-            <p className="text-[#264E86]/80 mb-6">Temukan kesempatan magang terbaik untuk memulai karirmu.</p>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in-slide-up">
+            <div className="mb-8 p-8 rounded-2xl bg-gradient-to-r from-brand-primary to-brand-dark text-white shadow-lg relative overflow-hidden">
+                <div className="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+                <div className="relative z-10">
+                    <h1 className="text-3xl font-heading font-bold">Halo, {user.name.split(' ')[0]}! 👋</h1>
+                    <p className="text-blue-100 mt-2 text-lg max-w-xl">Siap mengejar peluang baru hari ini? Lengkapi profilmu dan mulai melamar ke perusahaan impian.</p>
+                </div>
+            </div>
             
-            <div className="flex flex-col md:flex-row gap-8">
+            <div className="flex flex-col lg:flex-row gap-8">
                 <Sidebar role={Role.STUDENT} />
-                <main className="flex-1">
+                <main className="flex-1 min-w-0">
                     <Outlet context={{ setSelectedInternship }} />
                 </main>
             </div>

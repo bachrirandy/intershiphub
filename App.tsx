@@ -35,7 +35,7 @@ const AppContent: React.FC = () => {
     const { isAuthModalOpen, authModalConfig } = useModal();
 
     return (
-        <div className="min-h-screen bg-[#EFF0F4] font-sans">
+        <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
             <Navbar />
             <main>
                 <Routes>

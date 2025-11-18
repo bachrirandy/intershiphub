@@ -54,12 +54,12 @@ const StudentSearchPage: React.FC = () => {
                         placeholder="Cari posisi atau perusahaan..."
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
-                        className="md:col-span-2 w-full border bg-white border-gray-300 rounded-md shadow-sm p-2 text-[#264E86] focus:outline-none focus:ring-2 focus:ring-[#0074E4]"
+                        className="md:col-span-2 w-full border bg-white border-gray-300 rounded-md shadow-sm p-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-primary"
                     />
                     <select
                         value={locationFilter}
                         onChange={e => setLocationFilter(e.target.value)}
-                         className="w-full border bg-white border-gray-300 rounded-md shadow-sm p-2 text-[#264E86] focus:outline-none focus:ring-2 focus:ring-[#0074E4]"
+                         className="w-full border bg-white border-gray-300 rounded-md shadow-sm p-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-primary"
                     >
                         <option value="">Semua Lokasi</option>
                         {uniqueLocations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
@@ -67,7 +67,7 @@ const StudentSearchPage: React.FC = () => {
                      <select
                         value={fieldFilter}
                         onChange={e => setFieldFilter(e.target.value)}
-                         className="w-full border bg-white border-gray-300 rounded-md shadow-sm p-2 text-[#264E86] focus:outline-none focus:ring-2 focus:ring-[#0074E4]"
+                         className="w-full border bg-white border-gray-300 rounded-md shadow-sm p-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-primary"
                     >
                         <option value="">Semua Bidang</option>
                         {uniqueFields.map(field => <option key={field} value={field}>{field}</option>)}
@@ -75,7 +75,7 @@ const StudentSearchPage: React.FC = () => {
                     <select
                         value={jobTypeFilter}
                         onChange={e => setJobTypeFilter(e.target.value)}
-                         className="w-full border bg-white border-gray-300 rounded-md shadow-sm p-2 text-[#264E86] focus:outline-none focus:ring-2 focus:ring-[#0074E4]"
+                         className="w-full border bg-white border-gray-300 rounded-md shadow-sm p-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-primary"
                     >
                         <option value="">Semua Tipe</option>
                         <option value="On-site">On-site</option>
@@ -96,7 +96,7 @@ const StudentSearchPage: React.FC = () => {
                         />
                     ))
                 ) : (
-                    <p className="md:col-span-3 text-center text-[#264E86]/80">
+                    <p className="md:col-span-3 text-center text-slate-500">
                         Tidak ada lowongan yang cocok dengan kriteria pencarian Anda.
                     </p>
                 )}

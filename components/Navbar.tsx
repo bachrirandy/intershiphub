@@ -9,6 +9,7 @@ const Navbar: React.FC = () => {
     const { openAuthModal } = useModal();
     const navigate = useNavigate();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const handleLogout = () => {
@@ -43,66 +44,93 @@ const Navbar: React.FC = () => {
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
+        
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 10);
+        };
+        window.addEventListener('scroll', handleScroll);
+
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
+            window.removeEventListener('scroll', handleScroll);
         };
     }, []);
 
     return (
-        <header className="bg-white shadow-md sticky top-0 z-40">
-            <nav className="container mx-auto px-6 py-3 flex justify-between items-center">
-                <NavLink to="/" className="text-2xl font-bold text-[#0074E4]">
-                    InternshipHub
+        <header className={`sticky top-0 z-40 transition-all duration-300 ${scrolled ? 'bg-white/70 backdrop-blur-lg border-b border-white/20 shadow-soft' : 'bg-transparent'}`}>
+            <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
+                <NavLink to="/" className="flex items-center gap-2 group">
+                    <div className="w-8 h-8 bg-brand-primary rounded-lg flex items-center justify-center transform group-hover:rotate-12 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <span className="text-xl font-heading font-bold text-slate-900 tracking-tight">
+                        Internship<span className="text-brand-primary">Hub</span>
+                    </span>
                 </NavLink>
-                <div className="flex items-center space-x-4">
-                    <NavLink to="/resources" className={({isActive}) => `text-base font-medium ${isActive ? 'text-[#0074E4]' : 'text-[#264E86]'} hover:text-[#0074E4] transition-colors`}>
-                        Resources
+                
+                <div className="flex items-center space-x-3 md:space-x-6">
+                    <NavLink to="/resources" className={({isActive}) => `text-sm font-medium transition-colors px-3 py-2 rounded-full ${isActive ? 'bg-brand-light text-brand-dark' : 'text-slate-600 hover:text-brand-primary hover:bg-slate-100'}`}>
+                        Resource Center
                     </NavLink>
+                    
                     {user ? (
                         <div className="relative" ref={dropdownRef}>
-                            <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="flex items-center justify-center w-10 h-10 bg-[#EFF0F4] rounded-full overflow-hidden border-2 border-transparent hover:border-[#0074E4] transition-colors focus:outline-none focus:ring-2 focus:ring-[#0074E4]">
-                                {user.profilePictureUrl || user.logoUrl ? (
-                                    <img src={user.profilePictureUrl || user.logoUrl} alt="Profile" className="w-full h-full object-cover" />
-                                ) : (
-                                    <span className="font-bold text-[#0074E4] text-lg">{user.name.charAt(0)}</span>
-                                )}
+                            <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="flex items-center gap-2 pl-2 pr-1 py-1 bg-white border border-slate-200 rounded-full hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary/50">
+                                <span className="text-sm font-semibold text-slate-700 pl-1 hidden md:block">{user.name.split(' ')[0]}</span>
+                                <div className="w-8 h-8 rounded-full bg-brand-primary text-white flex items-center justify-center overflow-hidden text-sm font-bold">
+                                    {user.profilePictureUrl || user.logoUrl ? (
+                                        <img src={user.profilePictureUrl || user.logoUrl} alt="Profile" className="w-full h-full object-cover" />
+                                    ) : (
+                                        user.name.charAt(0).toUpperCase()
+                                    )}
+                                </div>
                             </button>
+                            
                             {isDropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl py-1 z-50 animate-fade-in">
-                                    <div className="px-4 py-2 border-b">
-                                        <p className="text-sm font-semibold text-[#264E86] truncate">{user.name}</p>
-                                        <p className="text-xs text-[#264E86]/70 truncate">{user.email}</p>
+                                <div className="absolute right-0 mt-3 w-60 bg-white rounded-2xl shadow-xl ring-1 ring-black ring-opacity-5 py-2 z-50 animate-scale-in origin-top-right border border-slate-100">
+                                    <div className="px-5 py-3 border-b border-slate-100">
+                                        <p className="text-sm font-bold text-slate-900 truncate">{user.name}</p>
+                                        <p className="text-xs text-slate-500 truncate font-medium">{user.email}</p>
+                                        <span className="inline-block mt-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-brand-light text-brand-dark">
+                                            {user.role}
+                                        </span>
                                     </div>
-                                    <NavLink 
-                                        to={getProfilePath()}
-                                        onClick={() => setIsDropdownOpen(false)}
-                                        className="block px-4 py-2 text-sm text-[#264E86] hover:bg-[#EFF0F4]"
-                                    >
-                                        Profil
-                                    </NavLink>
-                                    <NavLink 
-                                        to={getDashboardPath()}
-                                        onClick={() => setIsDropdownOpen(false)}
-                                        className="block px-4 py-2 text-sm text-[#264E86] hover:bg-[#EFF0F4]"
-                                    >
-                                        Dashboard
-                                    </NavLink>
-                                    <button 
-                                        onClick={handleLogout} 
-                                        className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-[#EFF0F4]"
-                                    >
-                                        Logout
-                                    </button>
+                                    <div className="py-1">
+                                        <NavLink 
+                                            to={getDashboardPath()}
+                                            onClick={() => setIsDropdownOpen(false)}
+                                            className="flex items-center px-5 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-brand-primary transition-colors"
+                                        >
+                                            Dashboard
+                                        </NavLink>
+                                        <NavLink 
+                                            to={getProfilePath()}
+                                            onClick={() => setIsDropdownOpen(false)}
+                                            className="flex items-center px-5 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-brand-primary transition-colors"
+                                        >
+                                            Edit Profil
+                                        </NavLink>
+                                    </div>
+                                    <div className="border-t border-slate-100 mt-1 pt-1">
+                                        <button 
+                                            onClick={handleLogout} 
+                                            className="w-full text-left flex items-center px-5 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+                                        >
+                                            Keluar
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </div>
                     ) : (
                         <>
-                            <button onClick={() => openAuthModal({ mode: 'login', role: Role.STUDENT })} className="text-base font-medium text-[#264E86] hover:text-[#0074E4] transition-colors">
-                                Login
+                            <button onClick={() => openAuthModal({ mode: 'login', role: Role.STUDENT })} className="hidden md:block text-sm font-semibold text-slate-600 hover:text-brand-primary transition-colors px-4">
+                                Masuk
                             </button>
-                            <button onClick={() => openAuthModal({ mode: 'register', role: Role.STUDENT })} className="bg-[#0074E4] text-white px-4 py-2 rounded-md font-medium hover:bg-[#264E86] transition-colors">
-                                Register
+                            <button onClick={() => openAuthModal({ mode: 'register', role: Role.STUDENT })} className="bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-brand-primary hover:shadow-glow transition-all duration-300 transform hover:-translate-y-0.5">
+                                Daftar Sekarang
                             </button>
                         </>
                     )}
